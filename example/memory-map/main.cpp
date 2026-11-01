@@ -11,7 +11,7 @@ auto main(int argc, char** argv)->int {
 
     const std::string mmap_filename_option{"-m,--mmap-file"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {mmap_filename_option}, "Test memory-map");
 
     std::string filename{};
@@ -28,7 +28,7 @@ auto main(int argc, char** argv)->int {
     constexpr std::size_t new_file_size = 1024;
 
     {
-        descriptor::file file{};
+        fd::file file{};
 
         auto result = file.open(filename);
 
@@ -37,7 +37,7 @@ auto main(int argc, char** argv)->int {
             return result.value();
         }
 
-        result = file.memory_map(descriptor::memory_map_access::write, new_file_size);
+        result = file.memory_map(fd::memory_map_access::write, new_file_size);
         if (result) {
             logger->error("Failed to memory map file {} with result {}", filename, result.message());
             return result.value();
@@ -50,7 +50,7 @@ auto main(int argc, char** argv)->int {
 
     // Print the content of the file to verify the write operation
     {
-        descriptor::reader reader(filename);
+        fd::reader reader(filename);
 
         std::array<char, new_file_size> buffer{};
         auto const read_result = reader.read(buffer);

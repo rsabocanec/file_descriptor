@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(message-queue-subscriber main.cpp)
 
-add_dependencies(message-queue-subscriber descriptor)
+add_dependencies(message-queue-subscriber fd)
 
 target_include_directories(message-queue-subscriber PRIVATE ${CMAKE_SOURCE_DIR})
 

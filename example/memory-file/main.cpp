@@ -12,7 +12,7 @@ auto main(int argc, char** argv)->int {
 
     const std::string mem_filename_option{"-m,--mem-file"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {mem_filename_option}, "Test memory-file reader");
 
     std::string mem_filename{};
@@ -28,7 +28,7 @@ auto main(int argc, char** argv)->int {
 
     constexpr std::size_t new_file_size = 1024;
 
-    descriptor::memory_file mem_file_writer{};
+    fd::memory_file mem_file_writer{};
 
     constexpr std::string_view data = "Hello, memory-mapped file!";
 
@@ -52,7 +52,7 @@ auto main(int argc, char** argv)->int {
     }
 
     {
-    descriptor::memory_file mem_file_reader{std::move(mem_file_writer)};
+    fd::memory_file mem_file_reader{std::move(mem_file_writer)};
 
     assert(mem_file_reader.valid());
 

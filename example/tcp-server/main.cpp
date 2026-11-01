@@ -11,7 +11,7 @@
 namespace {
     volatile std::sig_atomic_t signal_status;
 
-    descriptor::tcp_socket *g_server{nullptr};
+    fd::tcp_socket *g_server{nullptr};
 }
 
 void signal_handler(int signal) {
@@ -36,7 +36,7 @@ auto main(int argc, char **argv)->int {
     const std::string server_address_option{"-a,--address"};
     const std::string server_port_option{"-p,--port"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {server_address_option, server_port_option}, "Test TCP server");
     
     std::string server_address{};
@@ -52,7 +52,7 @@ auto main(int argc, char **argv)->int {
         return EXIT_FAILURE;
     }    
 
-    descriptor::tcp_socket server{};
+    fd::tcp_socket server{};
     g_server = &server;
 
     logger->info("Binding to {}:{}", server_address, server_port);
@@ -75,14 +75,14 @@ auto main(int argc, char **argv)->int {
             auto accept_result = server.accept();
             
             while (accept_result.has_value()) {
-                std::thread([logger](descriptor::acceptor&& acceptor) {
+                std::thread([logger](fd::acceptor&& acceptor) {
                     logger->info("New connection from {}:{}", acceptor.peer(), acceptor.peer_port());
 
                     std::array<char, 24> request{};
 
                     std::ofstream ofs{"/tmp/received.txt"};
 
-                    descriptor::expected_result read_result{};
+                    fd::expected_result read_result{};
 
                     do {
                         read_result = acceptor.read(request);

@@ -17,7 +17,7 @@
 namespace {
     volatile std::sig_atomic_t signal_status;
 
-    descriptor::can_socket *g_subscriber{nullptr};
+    fd::can_socket *g_subscriber{nullptr};
 
     std::atomic_bool g_running{true};
 }
@@ -47,7 +47,7 @@ auto main(int argc, char **argv)->int {
 
     const std::string can_device_option{"-c,--can-device"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {can_device_option}, "Test CAN subscriber");
 
     std::string can_device{};
@@ -61,7 +61,7 @@ auto main(int argc, char **argv)->int {
         return EXIT_FAILURE;
     }
 
-    descriptor::can_socket subscriber{};
+    fd::can_socket subscriber{};
     g_subscriber = &subscriber;
     
     if (auto const result = subscriber.bind(can_device)) {
@@ -70,7 +70,7 @@ auto main(int argc, char **argv)->int {
         return result.value();
     }
 
-    std::vector<uint8_t> buffer(descriptor::can_socket_frame::can_frame_buffer_size);
+    std::vector<uint8_t> buffer(fd::can_socket_frame::can_frame_buffer_size);
 
     while (g_running) {
         auto const result = subscriber.read(buffer.begin(), buffer.end());
@@ -82,7 +82,7 @@ auto main(int argc, char **argv)->int {
         }
 
 
-        descriptor::can_socket_frame frame(buffer.cbegin(), buffer.cend());
+        fd::can_socket_frame frame(buffer.cbegin(), buffer.cend());
 
         logger->info("CAN frame: 0x{:08x}\t{:016x}", 
             ::ntohl(frame.header().uint32_id_), ::__bswap_64(std::bit_cast<uint64_t>(frame.payload())));

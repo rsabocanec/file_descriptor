@@ -5,7 +5,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-namespace descriptor {
+namespace fd {
 
 std::error_code tcp_socket::create() noexcept {
     auto result = close();

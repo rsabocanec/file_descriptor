@@ -8,7 +8,7 @@
 auto main(int argc, char **argv)->int {
     const std::string input_filename{"-i,--input"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {input_filename}, "Test select() function");
 
     std::string filename{};
@@ -22,7 +22,7 @@ auto main(int argc, char **argv)->int {
         return EXIT_FAILURE;
     }
 
-    descriptor::reader reader{filename};
+    fd::reader reader{filename};
 
     if (!reader.valid()) {
         logger->error("Failed to open file {}", filename);

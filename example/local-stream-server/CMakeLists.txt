@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(local-stream-server main.cpp)
 
-add_dependencies(local-stream-server descriptor)
+add_dependencies(local-stream-server fd)
 
 target_include_directories(local-stream-server PRIVATE ${CMAKE_SOURCE_DIR})
 

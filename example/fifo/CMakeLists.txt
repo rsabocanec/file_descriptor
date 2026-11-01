@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(fifo main.cpp)
 
-add_dependencies(fifo descriptor)
+add_dependencies(fifo fd)
 
 target_include_directories(fifo PRIVATE ${CMAKE_SOURCE_DIR})
 

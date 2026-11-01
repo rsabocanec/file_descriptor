@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(tcp-server main.cpp)
 
-add_dependencies(tcp-server descriptor)
+add_dependencies(tcp-server fd)
 
 target_include_directories(tcp-server PRIVATE ${CMAKE_SOURCE_DIR})
 

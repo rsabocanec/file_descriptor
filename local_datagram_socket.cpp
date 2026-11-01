@@ -4,7 +4,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-namespace descriptor {
+namespace fd {
 
 std::error_code local_datagram_socket::create() noexcept {
     auto result = close();

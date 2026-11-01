@@ -10,7 +10,7 @@
 
 #include <netinet/in.h>
 
-namespace descriptor {
+namespace fd {
 std::size_t can_socket_frame::can_frame_buffer_size = sizeof(struct can_frame);
 
 can_socket_frame::can_socket_frame(std::span<const std::byte> buffer) noexcept

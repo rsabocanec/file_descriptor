@@ -9,7 +9,7 @@ auto main(int argc, char **argv)->int {
     const std::string server_address_option{"-a,--address"};
     const std::string server_port_option{"-p,--port"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {server_address_option, server_port_option}, "Test UDP client");
 
     std::string server_address{};
@@ -25,7 +25,7 @@ auto main(int argc, char **argv)->int {
         return EXIT_FAILURE;
     }
 
-    descriptor::udp_socket client{};
+    fd::udp_socket client{};
 
     std::array<uint8_t, 4096> buffer{};
 

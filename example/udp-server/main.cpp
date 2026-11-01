@@ -9,10 +9,10 @@ auto main(int argc, char **argv)->int {
     const std::string server_address_option{"-a,--address"};
     const std::string server_port_option{"-p,--port"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {server_address_option, server_port_option}, "Test UDP server");
 
-    descriptor::udp_socket server{};
+    fd::udp_socket server{};
 
     std::string server_address{};
     uint16_t server_port{};

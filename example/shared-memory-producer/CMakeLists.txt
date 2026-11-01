@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(shared-memory-producer main.cpp)
 
-add_dependencies(shared-memory-producer descriptor)
+add_dependencies(shared-memory-producer fd)
 
 target_include_directories(shared-memory-producer PRIVATE ${CMAKE_SOURCE_DIR})
 

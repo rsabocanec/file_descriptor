@@ -34,10 +34,10 @@ auto main(int argc, char **argv)->int {
 
     const std::string can_device_option{"-c,--can-device"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {can_device_option}, "Test CAN publisher");
 
-    descriptor::can_socket publisher{};
+    fd::can_socket publisher{};
 
     std::string can_device{};
 
@@ -55,7 +55,7 @@ auto main(int argc, char **argv)->int {
         return result.value();
     }
 
-    std::vector<uint8_t> buffer(descriptor::can_socket_frame::can_frame_buffer_size);
+    std::vector<uint8_t> buffer(fd::can_socket_frame::can_frame_buffer_size);
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -64,13 +64,13 @@ auto main(int argc, char **argv)->int {
     std::uniform_int_distribution<uint64_t> can_payload_distrib{};
     std::uniform_int_distribution<uint8_t> can_payload_length_distrib(1, 8);
 
-    descriptor::can_socket_frame frame{};
+    fd::can_socket_frame frame{};
 
     while (!stop_flag.load()) {
         frame.header(can_id_distrib(gen));
 
         auto const pl = can_payload_distrib(gen);
-        frame.payload(std::bit_cast<descriptor::can_payload>(pl));
+        frame.payload(std::bit_cast<fd::can_payload>(pl));
 
         frame.payload_length(can_payload_length_distrib(gen));
 

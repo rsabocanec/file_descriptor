@@ -1,4 +1,4 @@
 #include "bound_socket.h"
 
-namespace descriptor {
+namespace fd {
 } // descriptor

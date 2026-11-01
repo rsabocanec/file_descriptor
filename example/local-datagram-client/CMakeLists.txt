@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(local-datagram-client main.cpp)
 
-add_dependencies(local-datagram-client descriptor)
+add_dependencies(local-datagram-client fd)
 
 target_include_directories(local-datagram-client PRIVATE ${CMAKE_SOURCE_DIR})
 

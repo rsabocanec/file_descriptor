@@ -9,7 +9,7 @@ auto main(int argc, char **argv)->int {
 
     const std::string socket_filename_option{"-s,--socket-file"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {socket_filename_option}, "Test poll() function");
         
     std::string socket_filename{};
@@ -23,8 +23,8 @@ auto main(int argc, char **argv)->int {
         return EXIT_FAILURE;
     }
 
-    std::unique_ptr<descriptor::datagram_socket> server =
-        std::make_unique<descriptor::local_datagram_socket>();
+    std::unique_ptr<fd::datagram_socket> server =
+        std::make_unique<fd::local_datagram_socket>();
 
     if (auto const result = server->bind(socket_filename)) {
         logger->error("Failed to bind to {} with result {} {}", 
@@ -56,7 +56,7 @@ auto main(int argc, char **argv)->int {
         }
     }
 
-    if (auto const result = descriptor::unlink(socket_filename)) {
+    if (auto const result = fd::unlink(socket_filename)) {
         logger->error("Failed to unlink {} with result {} {}", 
             socket_filename, result.value(), result.message());
     }

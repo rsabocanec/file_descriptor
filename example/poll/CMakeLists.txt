@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(poll main.cpp)
 
-add_dependencies(poll descriptor)
+add_dependencies(poll fd)
 
 target_include_directories(poll PRIVATE ${CMAKE_SOURCE_DIR})
 
