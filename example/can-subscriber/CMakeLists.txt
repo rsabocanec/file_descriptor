@@ -9,4 +9,4 @@ add_dependencies(can-subscriber fd)
 
 target_include_directories(can-subscriber PRIVATE ${CMAKE_SOURCE_DIR})
 
-target_link_libraries(can-subscriber PRIVATE descriptor CLI11::CLI11 spdlog::spdlog fmt::fmt)
+target_link_libraries(can-subscriber PRIVATE fd CLI11::CLI11 spdlog::spdlog fmt::fmt)

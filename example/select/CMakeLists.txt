@@ -9,4 +9,4 @@ add_dependencies(select fd)
 
 target_include_directories(select PRIVATE ${CMAKE_SOURCE_DIR})
 
-target_link_libraries(select PRIVATE descriptor CLI11::CLI11 fmt::fmt spdlog::spdlog)
+target_link_libraries(select PRIVATE fd CLI11::CLI11 fmt::fmt spdlog::spdlog)

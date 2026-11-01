@@ -9,4 +9,4 @@ add_dependencies(local-datagram-server fd)
 
 target_include_directories(local-datagram-server PRIVATE ${CMAKE_SOURCE_DIR})
 
-target_link_libraries(local-datagram-server PRIVATE descriptor CLI11::CLI11 fmt::fmt spdlog::spdlog)
+target_link_libraries(local-datagram-server PRIVATE fd CLI11::CLI11 fmt::fmt spdlog::spdlog)

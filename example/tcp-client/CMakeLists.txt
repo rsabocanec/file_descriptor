@@ -9,4 +9,4 @@ add_dependencies(tcp-client fd)
 
 target_include_directories(tcp-client PRIVATE ${CMAKE_SOURCE_DIR})
 
-target_link_libraries(tcp-client PRIVATE descriptor CLI11::CLI11 spdlog::spdlog fmt::fmt)
+target_link_libraries(tcp-client PRIVATE fd CLI11::CLI11 spdlog::spdlog fmt::fmt)
