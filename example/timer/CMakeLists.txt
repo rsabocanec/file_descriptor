@@ -7,4 +7,4 @@ add_dependencies(timer fd)
 
 target_include_directories(timer PRIVATE ${CMAKE_SOURCE_DIR})
 
-target_link_libraries(timer PRIVATE descriptor CLI11::CLI11 spdlog::spdlog fmt::fmt)
+target_link_libraries(timer PRIVATE fd CLI11::CLI11 spdlog::spdlog fmt::fmt)

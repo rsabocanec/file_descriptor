@@ -9,5 +9,5 @@ add_dependencies(memory-file fd)
 
 target_include_directories(memory-file PRIVATE ${CMAKE_SOURCE_DIR})
 
-target_link_libraries(memory-file PRIVATE descriptor CLI11::CLI11 fmt::fmt spdlog::spdlog )
+target_link_libraries(memory-file PRIVATE fd CLI11::CLI11 fmt::fmt spdlog::spdlog )
 

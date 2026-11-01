@@ -9,4 +9,4 @@ add_dependencies(shared-memory-consumer fd)
 
 target_include_directories(shared-memory-consumer PRIVATE ${CMAKE_SOURCE_DIR})
 
-target_link_libraries(shared-memory-consumer PRIVATE descriptor CLI11::CLI11 spdlog::spdlog fmt::fmt)
+target_link_libraries(shared-memory-consumer PRIVATE fd CLI11::CLI11 spdlog::spdlog fmt::fmt)
