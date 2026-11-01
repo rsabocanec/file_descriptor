@@ -34,10 +34,10 @@ auto main(int argc, char **argv)->int {
 
     const std::string can_device_option{"-m,--message-queue"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {can_device_option}, "Test CAN publisher");
 
-    std::unique_ptr<descriptor::basic_file> publisher {new descriptor::message_queue};
+    std::unique_ptr<fd::basic_file> publisher {new fd::message_queue};
 
     std::string message_queue_name{};
 
@@ -56,9 +56,9 @@ auto main(int argc, char **argv)->int {
         return result.value();
     }
 
-    descriptor::message_queue::attributes attr{};
+    fd::message_queue::attributes attr{};
 
-    if (auto const result = dynamic_cast<descriptor::message_queue*>(publisher.get())->get_attributes(attr)) {
+    if (auto const result = dynamic_cast<fd::message_queue*>(publisher.get())->get_attributes(attr)) {
         logger->error("Failed to get message queue attributes, with error {} {}", 
             result.value(), result.message());
         return EXIT_FAILURE;

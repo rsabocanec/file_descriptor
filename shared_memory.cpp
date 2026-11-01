@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 
 
-std::error_code descriptor::shared_memory::open(std::string_view path, int32_t flags, int32_t mode/* = 0*/) noexcept {
+std::error_code fd::shared_memory::open(std::string_view path, int32_t flags, int32_t mode/* = 0*/) noexcept {
     descriptor_ = ::shm_open(path.data(), flags, mode);
 
     if (descriptor_.load() == -1) {
@@ -16,7 +16,7 @@ std::error_code descriptor::shared_memory::open(std::string_view path, int32_t f
     return {};
 }
 
-std::error_code descriptor::shared_memory::close() noexcept {
+std::error_code fd::shared_memory::close() noexcept {
     std::error_code result = file::close();
 
     if (!path_.empty()) {

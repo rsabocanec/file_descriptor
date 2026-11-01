@@ -13,7 +13,7 @@ auto main(int argc, char** argv) ->int {
 
     const std::string shmem_filename_option{"-s,--shmem-filename"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {shmem_filename_option}, "Test shared memory consumer");
 
     std::string shmem_filename{};
@@ -29,9 +29,9 @@ auto main(int argc, char** argv) ->int {
 
     constexpr std::size_t shared_memory_size = 1024;
 
-    descriptor::shared_memory shared_mem{};
+    fd::shared_memory shared_mem{};
 
-    if (auto const open_result = shared_mem.open(shmem_filename, descriptor::open_flags::read_write)) {
+    if (auto const open_result = shared_mem.open(shmem_filename, fd::open_flags::read_write)) {
         logger->error("Failed to open shared memory {}, with error {} '{}'", 
             shmem_filename, open_result.value(), open_result.message());
         return open_result.value();
@@ -39,7 +39,7 @@ auto main(int argc, char** argv) ->int {
 
     logger->info("Shared memory {} opened successfully", shmem_filename);
 
-    descriptor::named_semaphore semaphore{};
+    fd::named_semaphore semaphore{};
 
     const std::string semaphore_name = "/" + std::string(shmem_filename) + "_semaphore";
 

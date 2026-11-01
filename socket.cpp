@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-namespace descriptor {
+namespace fd {
 
 expected_result socket::splice_impl(const descriptor& source, std::size_t count,
                                                  std::optional<int32_t> offset/* = std::nullopt*/) const noexcept {

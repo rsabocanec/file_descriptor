@@ -21,7 +21,7 @@
 #define _FILE_OFFSET_BITS 64
 #include <unistd.h>
 
-namespace descriptor {
+namespace fd {
 
 void polled_state::set_state(int16_t revents) noexcept {
     has_something_to_read_ = revents & POLLIN;

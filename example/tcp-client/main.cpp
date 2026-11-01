@@ -11,7 +11,7 @@ auto main(int argc, char **argv)->int {
     const std::string server_address_option{"-a,--address"};
     const std::string server_port_option{"-p,--port"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {server_address_option, server_port_option}, "Test TCP client");
 
     std::string server_address{};
@@ -27,7 +27,7 @@ auto main(int argc, char **argv)->int {
         return EXIT_FAILURE;
     }
     
-    descriptor::tcp_socket client{};
+    fd::tcp_socket client{};
 
     logger->info("Connecting to {}:{}", server_address, server_port);
 

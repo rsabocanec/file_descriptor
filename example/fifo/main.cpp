@@ -24,7 +24,7 @@ void signal_handler(int signal) {
         case SIGTERM:
 	    case SIGINT:
             run = false;
-            if (auto const result = descriptor::unlink(fifo_path)) {
+            if (auto const result = fd::unlink(fifo_path)) {
                 fmt::print(fg(fmt::color::crimson), "Failed to unlink {} with result {}!\n", 
                     fifo_path.c_str(), result.value());
             }
@@ -45,7 +45,7 @@ auto main(int argc, char **argv)->int {
 
     const std::string filename_option{"-f,--fifo"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {filename_option}, "Test make_fifo() function");
 
     try {
@@ -57,7 +57,7 @@ auto main(int argc, char **argv)->int {
         return EXIT_FAILURE;
     }
 
-    if (auto const result = descriptor::make_fifo(fifo_path)) {
+    if (auto const result = fd::make_fifo(fifo_path)) {
         logger->error("Failed to create fifo file {}, with error {} {}!", 
             fifo_path, result.value(), result.message());
         return EXIT_FAILURE;
@@ -69,7 +69,7 @@ auto main(int argc, char **argv)->int {
         std::string request{};
         std::cin >> request;
 
-        descriptor::writer fifo_writer(fifo_path);
+        fd::writer fifo_writer(fifo_path);
 
         if (!fifo_writer.valid()) {
             logger->error("Failed to open file {} for writing", fifo_path);

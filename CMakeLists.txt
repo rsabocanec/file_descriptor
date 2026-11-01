@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 set(SUPPORT_STACKTRACE False)
 
-add_library(descriptor SHARED descriptor.cpp
+add_library(fd SHARED descriptor.cpp
         socket.cpp
         stream_socket.cpp
         tcp_socket.cpp
@@ -22,7 +22,7 @@ add_library(descriptor SHARED descriptor.cpp
         semaphores.cpp
         message_queue.cpp)
 
-add_library(descriptor-static STATIC descriptor.cpp
+add_library(fd-static STATIC descriptor.cpp
         socket.cpp
         stream_socket.cpp
         tcp_socket.cpp
@@ -40,13 +40,13 @@ add_library(descriptor-static STATIC descriptor.cpp
         message_queue.cpp)
 
 if(SUPPORT_STACKTRACE)
-    target_compile_definitions(descriptor PUBLIC _STACKTRACE_SUPPORTED)
-    target_link_libraries(descriptor INTERFACE stdc++_libbacktrace)
+    target_compile_definitions(fd PUBLIC _STACKTRACE_SUPPORTED)
+    target_link_libraries(fd INTERFACE stdc++_libbacktrace)
 
-    target_compile_definitions(descriptor-static PUBLIC _STACKTRACE_SUPPORTED)
-    target_link_libraries(descriptor-static INTERFACE stdc++_libbacktrace)
+    target_compile_definitions(fd-static PUBLIC _STACKTRACE_SUPPORTED)
+    target_link_libraries(fd-static INTERFACE stdc++_libbacktrace)
 endif()
 
-set_target_properties(descriptor-static PROPERTIES OUTPUT_NAME descriptor)
+set_target_properties(fd-static PROPERTIES OUTPUT_NAME fd)
 
 add_subdirectory(example)

@@ -10,10 +10,10 @@
 auto main(int argc, char **argv)->int {
     const std::string server_path_option{"-s,--server-path"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {server_path_option}, "Test local stream server");
 
-    descriptor::local_stream_socket client{};
+    fd::local_stream_socket client{};
 
     std::string server_path{};
 

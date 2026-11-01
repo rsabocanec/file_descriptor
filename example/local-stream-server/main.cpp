@@ -11,7 +11,7 @@
 namespace {
     volatile std::sig_atomic_t signal_status;
 
-    descriptor::local_stream_socket *g_server{nullptr};
+    fd::local_stream_socket *g_server{nullptr};
 
     std::string server_path{};
 }
@@ -38,7 +38,7 @@ auto main(int argc, char **argv)->int {
 
     const std::string server_path_option{"-s,--server-path"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {server_path_option}, "Test local stream server");
 
     try {
@@ -50,7 +50,7 @@ auto main(int argc, char **argv)->int {
         return EXIT_FAILURE;
     }
 
-    descriptor::local_stream_socket server{};
+    fd::local_stream_socket server{};
     g_server = &server;
 
     auto result = server.bind(server_path);
@@ -65,7 +65,7 @@ auto main(int argc, char **argv)->int {
         else {
             auto accept_result = server.accept();
             while (accept_result.has_value()) {
-                std::thread([](descriptor::acceptor&& acceptor) {
+                std::thread([](fd::acceptor&& acceptor) {
                     std::cout << "New connection accepted\n";
 
                     std::array<char, 24> request{};

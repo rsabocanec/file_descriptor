@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(shared-memory-consumer main.cpp)
 
-add_dependencies(shared-memory-consumer descriptor)
+add_dependencies(shared-memory-consumer fd)
 
 target_include_directories(shared-memory-consumer PRIVATE ${CMAKE_SOURCE_DIR})
 

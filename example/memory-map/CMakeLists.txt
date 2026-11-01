@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(memory-map main.cpp)
 
-add_dependencies(memory-map descriptor)
+add_dependencies(memory-map fd)
 
 target_include_directories(memory-map PRIVATE ${CMAKE_SOURCE_DIR})
 

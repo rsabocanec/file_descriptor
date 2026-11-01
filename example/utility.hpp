@@ -1,5 +1,5 @@
-#ifndef DESCRIPTOR_EXAMPLE_UTILITY_HPP
-#define DESCRIPTOR_EXAMPLE_UTILITY_HPP
+#ifndef FD_EXAMPLE_UTILITY_HPP
+#define FD_EXAMPLE_UTILITY_HPP
 
 #pragma once
 
@@ -11,7 +11,7 @@
 #include <tuple>
 #include <string_view>
 
-namespace descriptor::example::utility {
+namespace fd::example::utility {
 
     inline std::tuple<std::shared_ptr<spdlog::logger>, std::unique_ptr<CLI::App>> init_app(
         int argc, char **argv, 
@@ -50,6 +50,6 @@ namespace descriptor::example::utility {
 
         return {logger, std::move(app)};
     }
-} // namespace descriptor::example::utility
+} // namespace fd::example::utility
 
-#endif //DESCRIPTOR_EXAMPLE_UTILITY_HPP
+#endif //FD_EXAMPLE_UTILITY_HPP

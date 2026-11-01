@@ -6,7 +6,7 @@
 #include <signal.h>
 #include <limits.h>
 
-namespace descriptor {
+namespace fd {
 std::error_code message_queue::open( std::string_view name, int32_t flags, int32_t mode) noexcept {
     if (descriptor_.load() != -1) {
         if (name == name_) {

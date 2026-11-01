@@ -13,7 +13,7 @@ auto main(int argc, char** argv)->int {
     const std::string address_option{"-a,--address"};
     const std::string port_option{"-p,--port"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {filename_option, address_option, port_option}, "Test TCP splice");
 
 
@@ -32,16 +32,16 @@ auto main(int argc, char** argv)->int {
         return EXIT_FAILURE;
     }
 
-    descriptor::file file{};
+    fd::file file{};
 
-    auto result = file.open(filename, descriptor::open_flags::read_only);
+    auto result = file.open(filename, fd::open_flags::read_only);
     if (result) {
         logger->error("Failed to open file {} with result {} '{}'", 
             filename, result.value(), result.message());
         return result.value();
     }
 
-    descriptor::tcp_socket client{};
+    fd::tcp_socket client{};
 
     result = client.connect(address, port);
     if (result) {

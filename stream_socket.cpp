@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-namespace descriptor {
+namespace fd {
 std::error_code stream_socket::listen(int32_t max_connections) const noexcept {
     if (descriptor_.load() == -1) {
         return std::make_error_code(std::errc::bad_file_descriptor);

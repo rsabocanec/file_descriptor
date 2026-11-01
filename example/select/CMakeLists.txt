@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(select main.cpp)
 
-add_dependencies(select descriptor)
+add_dependencies(select fd)
 
 target_include_directories(select PRIVATE ${CMAKE_SOURCE_DIR})
 

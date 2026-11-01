@@ -6,7 +6,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-namespace descriptor {
+namespace fd {
 std::error_code local_stream_socket::create() noexcept {
     auto result = close();
     if (!result) {

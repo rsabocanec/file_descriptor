@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-namespace descriptor {
+namespace fd {
 
 std::error_code udp_socket::create() noexcept {
     if (descriptor_.load() == -1) {

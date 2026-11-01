@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(can-publisher main.cpp)
 
-add_dependencies(can-publisher descriptor)
+add_dependencies(can-publisher fd)
 
 target_include_directories(can-publisher PRIVATE ${CMAKE_SOURCE_DIR})
 

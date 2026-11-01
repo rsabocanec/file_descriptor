@@ -11,11 +11,11 @@ auto main(int argc, char **argv)->int {
     const std::string server_filename_option{"-s,--server-file"};
     const std::string client_filename_option{"-c,--client-file"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {server_filename_option, client_filename_option}, "Test local datagram client");
 
-    std::unique_ptr<descriptor::datagram_socket> client =
-        std::make_unique<descriptor::local_datagram_socket>();
+    std::unique_ptr<fd::datagram_socket> client =
+        std::make_unique<fd::local_datagram_socket>();
     
     std::string client_filename{};
 
@@ -76,7 +76,7 @@ auto main(int argc, char **argv)->int {
         }
     }
     
-    if (auto const result = descriptor::unlink(client_filename)) {
+    if (auto const result = fd::unlink(client_filename)) {
         logger->error("Failed to unlink {} with result {} {}", 
             client_filename, result.value(), result.message());
     }

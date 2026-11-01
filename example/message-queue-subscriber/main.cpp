@@ -38,9 +38,9 @@ namespace {
 
         fmt::println("Handling notification from descriptor {}", *mq_desc);
 
-        descriptor::weak_descriptor<descriptor::message_queue> weak_mq{*mq_desc};
+        fd::weak_descriptor<fd::message_queue> weak_mq{*mq_desc};
 
-        descriptor::message_queue::attributes attr{};
+        fd::message_queue::attributes attr{};
 
         if (auto const attr_result = weak_mq.load().get_attributes(attr)) {
             stop_flag = true;
@@ -100,7 +100,7 @@ auto main(int argc, char **argv)->int {
 
     const std::string message_queue_option{"-m,--message-queue"};
 
-    auto [logger, app] = descriptor::example::utility::init_app(
+    auto [logger, app] = fd::example::utility::init_app(
         argc, argv, {message_queue_option}, "Test CAN subscriber");
 
     std::string message_queue_name{};
@@ -114,7 +114,7 @@ auto main(int argc, char **argv)->int {
         return EXIT_FAILURE;
     }
 
-    std::unique_ptr<descriptor::basic_file> subscriber{new descriptor::message_queue};
+    std::unique_ptr<fd::basic_file> subscriber{new fd::message_queue};
 
     if (auto const result = subscriber->open(message_queue_name)) {
         logger->error("Failed to open message queue {} with result {} {}",
@@ -122,7 +122,7 @@ auto main(int argc, char **argv)->int {
         return result.value();
     }
 
-    if (auto const result = dynamic_cast<descriptor::message_queue*>(subscriber.get())->notify(incoming_handler)) {
+    if (auto const result = dynamic_cast<fd::message_queue*>(subscriber.get())->notify(incoming_handler)) {
         logger->error("Failed to notify message queue {} with result {} {}",
             message_queue_name, result.value(), result.message());
         return result.value();
