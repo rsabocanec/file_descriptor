@@ -34,6 +34,10 @@ public:
         return bind(std::get<0>(result.value()), std::get<1>(result.value()));
     }
 
+    [[nodiscard]] std::error_code bind(uint16_t port) noexcept {
+        return bind({}, port);
+    }
+
     [[nodiscard]] std::error_code bind(std::string_view address, uint16_t port) noexcept;
 
     [[nodiscard]] std::expected<acceptor, std::error_code> accept() const noexcept final;

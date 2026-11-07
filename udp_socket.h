@@ -24,9 +24,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 namespace fd {
 
 class udp_socket : public datagram_socket {
-    
+
     bool bound_socket_{false};
-    
+
 public:
     udp_socket() = default;
 
@@ -37,6 +37,10 @@ public:
         }
 
         return bind(std::get<0>(result.value()), std::get<1>(result.value()));
+    }
+
+    [[nodiscard]] std::error_code bind(uint16_t port) noexcept {
+        return bind({}, port);
     }
 
     [[nodiscard]] std::error_code bind(std::string_view address, uint16_t port) noexcept;
