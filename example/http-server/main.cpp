@@ -103,7 +103,7 @@ auto main(int argc, char** argv)->int {
 
                         logger->info("Received '{}'", received);
 
-                        http::request request{};
+                        http::request request{logger};
 
                         const std::string response = request.handle(received);
 
