@@ -20,6 +20,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include <chrono>
 #include <atomic>
 #include <span>
+#include <deque>
 #include <optional>
 #include <string_view>
 #include <iterator>
@@ -32,6 +33,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 
 namespace fd {
+
+template<typename T>
+concept continuous_container = std::same_as<T, std::vector<typename T::value_type>> ||
+                              std::same_as<T, std::deque<typename T::value_type>> ||
+                              std::same_as<T, std::basic_string<typename T::value_type>>;
 
 template <typename Period>
 using duration = std::chrono::duration<int64_t, Period>;
@@ -171,6 +177,11 @@ public:
         return write(std::as_bytes(std::span(first, last)));
     }
 
+    template<continuous_container C>
+    [[nodiscard]] expected_result write(const C& container) const noexcept {
+        return write(std::cbegin(container), std::cend(container));
+    }
+
     template<class U, std::size_t N>
     [[nodiscard]] expected_result write(const std::array<U, N>& arr) const noexcept {
         return write(std::as_bytes(std::span(arr)));
@@ -205,25 +216,25 @@ class weak_descriptor {
 public:
     weak_descriptor() = default;
     explicit weak_descriptor(const Descriptor& desc) {
-        [[maybe_unused]] auto const old_descriptor = 
+        [[maybe_unused]] auto const old_descriptor =
             weak_descriptor_.store(desc.load());
     }
 
     explicit weak_descriptor(int32_t descriptor) {
-        [[maybe_unused]] auto const old_descriptor = 
+        [[maybe_unused]] auto const old_descriptor =
             weak_descriptor_.store(descriptor);
     }
 
     weak_descriptor(const weak_descriptor&) = delete;
     weak_descriptor(weak_descriptor&& other) noexcept {
-        [[maybe_unused]] auto const old_descriptor = 
+        [[maybe_unused]] auto const old_descriptor =
             weak_descriptor_.store(other.weak_descriptor_.release());
     }
 
     weak_descriptor& operator=(const weak_descriptor&) = delete;
     weak_descriptor& operator=(weak_descriptor&& other) noexcept {
         if (this != &other) {
-            [[maybe_unused]] auto const old_descriptor = 
+            [[maybe_unused]] auto const old_descriptor =
                 weak_descriptor_.store(other.weak_descriptor_.release());
         }
 

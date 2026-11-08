@@ -3,7 +3,7 @@ project(http-server)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(http-server main.cpp)
+add_executable(http-server http/request.cpp main.cpp)
 
 add_dependencies(http-server fd)
 

@@ -52,6 +52,11 @@ public:
         return write_to(std::as_bytes(std::span(first, last)), address);
     }
 
+    template<continuous_container C>
+    [[nodiscard]] expected_result write_to(const C& container, std::string_view address) const noexcept {
+        return write_to(std::cbegin(container), std::cend(container), address);
+    }
+
     template<class U, std::size_t N>
     [[nodiscard]] expected_result write_to(const std::array<U, N>& arr, std::string_view address) noexcept {
         return write_to(std::as_bytes(std::span(arr)), address);
