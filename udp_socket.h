@@ -102,7 +102,7 @@ public:
         return write_to(std::as_bytes(std::span(first, last)), address, port);
     }
 
-    template<continuous_container C>
+    template<contiguous_container C>
     [[nodiscard]] expected_result write_to(const C& container, std::string_view address, uint16_t port) const noexcept {
         return write_to(std::cbegin(container), std::cend(container), address, port);
     }

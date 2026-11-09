@@ -35,9 +35,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 namespace fd {
 
 template<typename T>
-concept continuous_container = std::same_as<T, std::vector<typename T::value_type>> ||
-                              std::same_as<T, std::deque<typename T::value_type>> ||
-                              std::same_as<T, std::basic_string<typename T::value_type>>;
+concept contiguous_container = std::contiguous_iterator<typename T::iterator>;
 
 template <typename Period>
 using duration = std::chrono::duration<int64_t, Period>;
@@ -177,7 +175,7 @@ public:
         return write(std::as_bytes(std::span(first, last)));
     }
 
-    template<continuous_container C>
+    template<contiguous_container C>
     [[nodiscard]] expected_result write(const C& container) const noexcept {
         return write(std::cbegin(container), std::cend(container));
     }
