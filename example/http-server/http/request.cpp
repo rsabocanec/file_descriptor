@@ -1,5 +1,6 @@
 #include "request.h"
 
+#include <fstream>
 #include <sstream>
 
 namespace fd::example::http {
@@ -45,11 +46,32 @@ bool request::parse(std::string_view request) noexcept {
 }
 
 std::string request::handle_get() const noexcept {
-    return std::string{"HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/plain\r\n"
-        "Content-Length: 52\r\n"
-        "\r\n"
-        "Hello from HTTP server written using the FD library!"};
+
+    std::string path{path_};
+
+    if (path == "/") {
+        path = "/index.html";
+    }
+
+    if (path_.contains("..")) {
+        return handle_error(400);
+    }
+
+    std::fstream ofs{"www/" +path, std::ios::in | std::ios::binary};
+
+    if (!ofs) {
+        return handle_error(404);
+    }
+
+    std::string content{std::istreambuf_iterator<char>{ofs}, std::istreambuf_iterator<char>{}};
+
+    std::string response{"HTTP/1.1 200 OK\r\n"
+                         "Content-Type: text/html\r\n"
+                         "Content-Length: " + std::to_string(content.size()) + "\r\n"
+                         "\r\n"
+                         + content};
+
+    return response;
 }
 
 std::string request::handle_post() const noexcept {
