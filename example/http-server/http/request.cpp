@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <filesystem>
 
 namespace fd::example::http {
 
@@ -57,13 +58,25 @@ std::string request::handle_get() const noexcept {
         return handle_error(400);
     }
 
-    std::fstream ofs{"www/" +path, std::ios::in | std::ios::binary};
+    std::string full_path{"www/"};
+    full_path += path;
+
+    if (!std::filesystem::exists(full_path)) {
+        return handle_error(404);
+    }
+
+    if (std::filesystem::is_directory(full_path)) {
+        full_path += "/index.html";
+    }
+
+    std::fstream ofs{full_path, std::ios::in | std::ios::binary};
 
     if (!ofs) {
         return handle_error(404);
     }
 
     std::string content{std::istreambuf_iterator<char>{ofs}, std::istreambuf_iterator<char>{}};
+    ofs.close();
 
     std::string response{"HTTP/1.1 200 OK\r\n"
                          "Content-Type: text/html\r\n"
