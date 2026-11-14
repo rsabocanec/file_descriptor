@@ -1,5 +1,7 @@
 #include "request.h"
 
+#include <file.h>
+
 #include <fstream>
 #include <sstream>
 #include <filesystem>
@@ -46,7 +48,7 @@ bool request::parse(std::string_view request) noexcept {
     return iss.good() || iss.eof();
 }
 
-std::string request::handle_get() const noexcept {
+fd::expected_result request::handle_get(const fd::acceptor& acceptor) const noexcept {
 
     std::string path{path_};
 
@@ -55,67 +57,71 @@ std::string request::handle_get() const noexcept {
     }
 
     if (path_.contains("..")) {
-        return handle_error(400);
+        return handle_error(400, acceptor);
     }
 
     std::string full_path{"www/"};
     full_path += path;
 
     if (!std::filesystem::exists(full_path)) {
-        return handle_error(404);
+        return handle_error(404, acceptor);
     }
 
     if (std::filesystem::is_directory(full_path)) {
         full_path += "/index.html";
     }
 
-    std::fstream ofs{full_path, std::ios::in | std::ios::binary};
+    fd::file file{};
 
-    if (!ofs) {
-        return handle_error(404);
+    if (auto result = file.open(full_path, fd::open_flags::read_only); result) {
+        logger_->error("Failed to open file {} with result {} '{}'",
+                        full_path, result.value(), result.message());
+        return handle_error(404, acceptor);
     }
-
-    std::string content{std::istreambuf_iterator<char>{ofs}, std::istreambuf_iterator<char>{}};
-    ofs.close();
 
     std::string response{"HTTP/1.1 200 OK\r\n"
                          "Content-Type: text/html\r\n"
-                         "Content-Length: " + std::to_string(content.size()) + "\r\n"
-                         "\r\n"
-                         + content};
+                         "Content-Length: " + std::to_string(file.size()) + "\r\n"
+                         "\r\n"};
 
-    return response;
+    if (auto result = acceptor.write(response); !result) {
+        logger_->error("Failed to send response header with result {} '{}'",
+                        result.error().value(), result.error().message());
+        return handle_error(500, acceptor);
+    }
+
+    return acceptor.splice(file, file.size());
 }
 
-std::string request::handle_post() const noexcept {
+fd::expected_result request::handle_post(const fd::acceptor& acceptor) const noexcept {
     return {};
 }
 
-std::string request::handle_put() const noexcept {
+fd::expected_result request::handle_put(const fd::acceptor& acceptor) const noexcept {
     return {};
 }
 
-std::string request::handle_delete() const noexcept {
+fd::expected_result request::handle_delete(const fd::acceptor& acceptor) const noexcept {
     return {};
 }
 
-std::string request::handle_head() const noexcept {
+fd::expected_result request::handle_head(const fd::acceptor& acceptor) const noexcept {
     return {};
 }
 
-std::string request::handle_options() const noexcept {
+fd::expected_result request::handle_options(const fd::acceptor& acceptor) const noexcept {
     return {};
 }
 
-std::string request::handle_patch() const noexcept {
+fd::expected_result request::handle_patch(const fd::acceptor& acceptor) const noexcept {
     return {};
 }
 
-std::string request::handle_trace() const noexcept {
+fd::expected_result request::handle_trace(const fd::acceptor& acceptor) const noexcept {
     return {};
 }
 
-std::string request::handle_error(uint16_t status_code) noexcept {
+fd::expected_result request::handle_error(uint16_t status_code, const fd::acceptor& acceptor) noexcept {
     std::ostringstream oss{};
 
     oss << "HTTP/1.1 " << status_code << " NOK\r\n"
@@ -123,6 +129,6 @@ std::string request::handle_error(uint16_t status_code) noexcept {
         << "Content-Length: 0\r\n"
         << "\r\n";
 
-    return oss.str();
+    return acceptor.write(oss.str());
 }
 }

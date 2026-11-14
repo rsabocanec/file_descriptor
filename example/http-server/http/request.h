@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <descriptor.h>
+#include <stream_socket.h>
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -10,6 +13,7 @@
 #include <cstdint>
 
 #include <spdlog/spdlog.h>
+
 
 namespace fd::example::http {
 
@@ -37,53 +41,54 @@ public:
 
     ~request() = default;
 
-    [[nodiscard]] std::string handle(std::string_view request) noexcept  {
+    [[nodiscard]] fd::expected_result handle(std::string_view request,
+                                             const fd::acceptor& acceptor) noexcept  {
         if (!parse(request)) {
-            return handle_error(400);
+            return handle_error(400, acceptor);
         }
 
         if (method_ == "GET") {
-            return handle_get();
+            return handle_get(acceptor);
         }
         else if (method_ == "POST") {
-            return handle_post();
+            return handle_post(acceptor);
         }
         else if (method_ == "PUT") {
-            return handle_put();
+            return handle_put(acceptor);
         }
         else if (method_ == "DELETE") {
-            return handle_delete();
+            return handle_delete(acceptor);
         }
         else if (method_ == "HEAD") {
-            return handle_head();
+            return handle_head(acceptor);
         }
         else if (method_ == "OPTIONS") {
-            return handle_options();
+            return handle_options(acceptor);
         }
         else if (method_ == "PATCH") {
-            return handle_patch();
+            return handle_patch(acceptor);
         }
         else if (method_ == "TRACE") {
-            return handle_trace();
+            return handle_trace(acceptor);
         }
         else {
-            return handle_error(501);
+            return handle_error(501, acceptor);
         }
     }
 
 private:
     [[nodiscard]] bool parse(std::string_view request) noexcept;
 
-    [[nodiscard]] std::string handle_get() const noexcept;
-    [[nodiscard]] std::string handle_post() const noexcept;
-    [[nodiscard]] std::string handle_put() const noexcept;
-    [[nodiscard]] std::string handle_delete() const noexcept;
-    [[nodiscard]] std::string handle_head() const noexcept;
-    [[nodiscard]] std::string handle_options() const noexcept;
-    [[nodiscard]] std::string handle_patch() const noexcept;
-    [[nodiscard]] std::string handle_trace() const noexcept;
+    [[nodiscard]] fd::expected_result handle_get(const fd::acceptor& acceptor) const noexcept;
+    [[nodiscard]] fd::expected_result handle_post(const fd::acceptor& acceptor) const noexcept;
+    [[nodiscard]] fd::expected_result handle_put(const fd::acceptor& acceptor) const noexcept;
+    [[nodiscard]] fd::expected_result handle_delete(const fd::acceptor& acceptor) const noexcept;
+    [[nodiscard]] fd::expected_result handle_head(const fd::acceptor& acceptor) const noexcept;
+    [[nodiscard]] fd::expected_result handle_options(const fd::acceptor& acceptor) const noexcept;
+    [[nodiscard]] fd::expected_result handle_patch(const fd::acceptor& acceptor) const noexcept;
+    [[nodiscard]] fd::expected_result handle_trace(const fd::acceptor& acceptor) const noexcept;
 
-    [[nodiscard]] static std::string handle_error(uint16_t status_code) noexcept;
+    [[nodiscard]] static fd::expected_result handle_error(uint16_t status_code, const fd::acceptor& acceptor) noexcept;
 };
 } // namespace fd::example::http
 

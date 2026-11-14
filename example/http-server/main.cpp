@@ -105,16 +105,14 @@ auto main(int argc, char** argv)->int {
 
                         http::request request{logger};
 
-                        const std::string response = request.handle(received);
+                        const fd::expected_result send_response = request.handle(received, acceptor);
 
-                        auto const write_result = acceptor.write(response);
-
-                        if (!write_result) {
+                        if (!send_response) {
                             logger->error("Response failed; {} '{}'",
-                                write_result.error().value(), write_result.error().message());
+                                send_response.error().value(), send_response.error().message());
                         }
                         else {
-                            logger->info("Sent '{}'", response);
+                            logger->info("Sent '{}'", send_response.value());
                         }
                     }
 
