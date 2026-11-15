@@ -30,6 +30,64 @@ void signal_handler(int signal) {
     }
 }
 
+namespace fd::example::http::handler {
+
+fd::expected_result get(std::string_view/* method*/,
+                        std::string_view path,
+                        std::string_view/* version*/,
+                        const header&/* headers*/,
+                        std::string_view/* body*/,
+                        const fd::acceptor& acceptor,
+                        std::shared_ptr<spdlog::logger> logger) noexcept {
+
+    std::string full_path{"www"};
+    full_path += path;
+
+    if (!full_path.ends_with('/')) {
+        full_path += '/';
+    }
+
+    if (path == "/") {
+        full_path += "index.html";
+    }
+
+    if (path.contains("..")) {
+        return request::handle_error(403, acceptor);
+    }
+
+    if (!std::filesystem::exists(full_path)) {
+        return request::handle_error(404, acceptor);
+    }
+
+    if (std::filesystem::is_directory(full_path)) {
+        full_path += "/index.html";
+        if (!std::filesystem::exists(full_path)) {
+            return request::handle_error(404, acceptor);
+        }
+    }
+
+    fd::file file{};
+
+    if (auto result = file.open(full_path, fd::open_flags::read_only); result) {
+        logger->error("Failed to open file {} with result {} '{}'",
+                        full_path, result.value(), result.message());
+        return request::handle_error(404, acceptor);
+    }
+
+    std::string response{"HTTP/1.1 200 OK\r\n"
+                         "Content-Type: text/html\r\n"
+                         "Content-Length: " + std::to_string(file.size()) + "\r\n"
+                         "\r\n"};
+
+    if (auto result = acceptor.write(response); !result) {
+        logger->error("Failed to send response header with result {} '{}'",
+                        result.error().value(), result.error().message());
+        return request::handle_error(500, acceptor);
+    }
+
+    return acceptor.splice(file, file.size());
+}
+} // namespace fd::example::http::handler
 
 auto main(int argc, char** argv)->int {
 
@@ -103,9 +161,10 @@ auto main(int argc, char** argv)->int {
 
                         logger->info("Received '{}'", received);
 
-                        http::request request{logger};
+                        http::request request{};
+                        request.set_get_handler(http::handler::get);
 
-                        const fd::expected_result send_response = request.handle(received, acceptor);
+                        const fd::expected_result send_response = request.handle(received, std::move(acceptor), logger);
 
                         if (!send_response) {
                             logger->error("Response failed; {} '{}'",
@@ -115,15 +174,6 @@ auto main(int argc, char** argv)->int {
                             logger->info("Sent '{}'", send_response.value());
                         }
                     }
-
-                    logger->info("Shutting down the acceptor!");
-
-                    [[maybe_unused]] auto shutdown_result = acceptor.shutdown();
-
-                    logger->info("Client {}:{} disconnected!", acceptor.peer(), acceptor.peer_port());
-
-                    logger->flush();
-
                 }, std::move(accept_result.value())).detach();
 
                 accept_result = server.accept();

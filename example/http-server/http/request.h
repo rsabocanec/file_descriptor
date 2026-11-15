@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <functional>
 
 #include <cstdint>
 
@@ -19,6 +20,38 @@ namespace fd::example::http {
 
 using header = std::vector<std::pair<std::string, std::string>>;
 
+using request_handler = std::function<fd::expected_result(  std::string_view,   // method
+                                                            std::string_view,   // path
+                                                            std::string_view,   // version
+                                                            const header&,      // headers
+                                                            std::string_view,   // body
+                                                            const fd::acceptor&,
+                                                            std::shared_ptr<spdlog::logger>)>;
+
+constexpr auto default_request_handler = [](std::string_view method,
+                                            std::string_view path,
+                                            std::string_view/* version*/,
+                                            const header&/* headers*/,
+                                            std::string_view/* body*/,
+                                            const fd::acceptor& responder,
+                                            std::shared_ptr<spdlog::logger> logger) -> fd::expected_result {
+
+    logger->info("Default '{}' request handler called for path '{}'", method, path);
+
+    constexpr std::string_view response{"HTTP/1.1 501 Not Implemented\r\n"
+                                        "Content-Type: text/plain\r\n"
+                                        "Content-Length: 0\r\n"
+                                        "\r\n"};
+
+    if (auto result = responder.write(response); !result) {
+        logger->error("Failed to send response with result {} '{}'",
+                        result.error().value(), result.error().message());
+        return result;
+    }
+
+    return {};
+};
+
 class request {
     std::string method_{};
     std::string path_{};
@@ -27,11 +60,17 @@ class request {
     header header_{};
     std::string body_{};
 
-    std::shared_ptr<spdlog::logger> logger_{};
+    request_handler get_handler_{default_request_handler};
+    request_handler post_handler_{default_request_handler};
+    request_handler put_handler_{default_request_handler};
+    request_handler delete_handler_{default_request_handler};
+    request_handler head_handler_{default_request_handler};
+    request_handler options_handler_{default_request_handler};
+    request_handler patch_handler_{default_request_handler};
+    request_handler trace_handler_{default_request_handler};
 
 public:
-    explicit request(std::shared_ptr<spdlog::logger> logger)
-    : logger_(logger) {}
+    request() = default;
 
     request(const request&) = delete;
     request(request&&) = default;
@@ -42,53 +81,47 @@ public:
     ~request() = default;
 
     [[nodiscard]] fd::expected_result handle(std::string_view request,
-                                             const fd::acceptor& acceptor) noexcept  {
-        if (!parse(request)) {
-            return handle_error(400, acceptor);
-        }
+                                             fd::acceptor&& acceptor,
+                                             std::shared_ptr<spdlog::logger> logger) noexcept;
 
-        if (method_ == "GET") {
-            return handle_get(acceptor);
-        }
-        else if (method_ == "POST") {
-            return handle_post(acceptor);
-        }
-        else if (method_ == "PUT") {
-            return handle_put(acceptor);
-        }
-        else if (method_ == "DELETE") {
-            return handle_delete(acceptor);
-        }
-        else if (method_ == "HEAD") {
-            return handle_head(acceptor);
-        }
-        else if (method_ == "OPTIONS") {
-            return handle_options(acceptor);
-        }
-        else if (method_ == "PATCH") {
-            return handle_patch(acceptor);
-        }
-        else if (method_ == "TRACE") {
-            return handle_trace(acceptor);
-        }
-        else {
-            return handle_error(501, acceptor);
-        }
+    void set_get_handler(request_handler handler) noexcept {
+        get_handler_ = std::move(handler);
     }
 
+    void set_post_handler(request_handler handler) noexcept {
+        post_handler_ = std::move(handler);
+    }
+
+    void set_put_handler(request_handler handler) noexcept {
+        put_handler_ = std::move(handler);
+    }
+
+    void set_delete_handler(request_handler handler) noexcept {
+        delete_handler_ = std::move(handler);
+    }
+
+    void set_head_handler(request_handler handler) noexcept {
+        head_handler_ = std::move(handler);
+    }
+
+    void set_options_handler(request_handler handler) noexcept {
+        options_handler_ = std::move(handler);
+    }
+
+    void set_patch_handler(request_handler handler) noexcept {
+        patch_handler_ = std::move(handler);
+    }
+
+    void set_trace_handler(request_handler handler) noexcept {
+        trace_handler_ = std::move(handler);
+    }
+
+    [[nodiscard]] static fd::expected_result handle_error(uint16_t status_code,
+                                                          const fd::acceptor& acceptor) noexcept;
+
 private:
-    [[nodiscard]] bool parse(std::string_view request) noexcept;
-
-    [[nodiscard]] fd::expected_result handle_get(const fd::acceptor& acceptor) const noexcept;
-    [[nodiscard]] fd::expected_result handle_post(const fd::acceptor& acceptor) const noexcept;
-    [[nodiscard]] fd::expected_result handle_put(const fd::acceptor& acceptor) const noexcept;
-    [[nodiscard]] fd::expected_result handle_delete(const fd::acceptor& acceptor) const noexcept;
-    [[nodiscard]] fd::expected_result handle_head(const fd::acceptor& acceptor) const noexcept;
-    [[nodiscard]] fd::expected_result handle_options(const fd::acceptor& acceptor) const noexcept;
-    [[nodiscard]] fd::expected_result handle_patch(const fd::acceptor& acceptor) const noexcept;
-    [[nodiscard]] fd::expected_result handle_trace(const fd::acceptor& acceptor) const noexcept;
-
-    [[nodiscard]] static fd::expected_result handle_error(uint16_t status_code, const fd::acceptor& acceptor) noexcept;
+    [[nodiscard]] bool parse(std::string_view request,
+                             std::shared_ptr<spdlog::logger> logger) noexcept;
 };
 } // namespace fd::example::http
 
