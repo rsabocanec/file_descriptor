@@ -119,6 +119,6 @@ protected:
     [[nodiscard]] std::error_code create() noexcept final;
 };
 
-} // descriptor
+} // namespace fd
 
 #endif //FD_UDP_SOCKET_H

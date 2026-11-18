@@ -88,4 +88,4 @@ std::error_code local_stream_socket::connect(std::string_view address) noexcept 
 
     return {};
 }
-} // descriptor
+} // namespace fd

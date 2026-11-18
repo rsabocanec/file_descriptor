@@ -246,6 +246,9 @@ public:
     Descriptor& load() noexcept {
         return weak_descriptor_;
     }
+
+    //[[nodiscard]] std::error_code set_nonblocking(bool nonblocking) const noexcept;
+    //[[nodiscard]] std::error_code set_close_on_exec(bool close_on_exec) const noexcept;
 };
 
 // Utility functions
@@ -253,5 +256,6 @@ void report_error(std::ostream& os, const std::error_code &ec, std::string_view 
     std::source_location location = std::source_location::current()) noexcept;
 
 [[nodiscard]] std::error_code unlink(std::string_view filename) noexcept;
-}
+
+} // namespace fd
 #endif //FD_DESCRIPTOR_H

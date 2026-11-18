@@ -77,7 +77,7 @@ expected_result descriptor::read(std::span<std::byte> buffer) const noexcept {
                     static_cast<void*>(buffer.data()),
                     static_cast<std::size_t>(buffer.size()));
 
-        return result != -1 ? expected_result{result} 
+        return result != -1 ? expected_result{result}
                             : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
     }
 
@@ -91,7 +91,7 @@ expected_result descriptor::write(std::span<const std::byte> buffer) const noexc
                     static_cast<const void*>(buffer.data()),
                     static_cast<std::size_t>(buffer.size()));
 
-        return result != -1 ? expected_result{result} 
+        return result != -1 ? expected_result{result}
                             : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
     }
 
@@ -114,7 +114,7 @@ expected_result descriptor::splice(const descriptor& source, std::size_t count,
                               offset_out ? &offset_out_value : nullptr,
                               count, flags);
 
-        return result != -1 ? expected_result{result} 
+        return result != -1 ? expected_result{result}
                             : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
     }
 
@@ -167,7 +167,7 @@ std::error_code descriptor::select(int64_t timeout_nanoseconds) const noexcept {
         return std::make_error_code(static_cast<std::errc>(error));
     }
 
-    return ready > 0 ? std::error_code{} 
+    return ready > 0 ? std::error_code{}
                      : std::make_error_code(std::errc::timed_out);
 }
 
@@ -223,7 +223,7 @@ std::error_code descriptor::poll(int64_t timeout_nanoseconds, polled_state &stat
         return std::make_error_code(static_cast<std::errc>(error));
     }
 
-    return ready > 0 ? std::error_code{} 
+    return ready > 0 ? std::error_code{}
                      : std::make_error_code(std::errc::timed_out);
 }
 
@@ -246,4 +246,4 @@ std::error_code unlink(std::string_view filename) noexcept {
     const int32_t result = ::unlink(filename.data());
     return result == -1 ? std::make_error_code(static_cast<std::errc>(errno)) : std::error_code{};
 }
-}
+} // namespace fd

@@ -1,13 +1,8 @@
 #include "stream_socket.h"
 
-#include <array>
-
-#include <exception>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 
 namespace fd {
 std::error_code stream_socket::listen(int32_t max_connections) const noexcept {
@@ -47,4 +42,4 @@ std::error_code stream_socket::disconnect() noexcept {
 
     return close();
 }
-} // descriptor
+} // namespace fd

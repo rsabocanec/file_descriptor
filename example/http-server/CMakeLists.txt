@@ -9,6 +9,6 @@ add_dependencies(http-server http fd)
 
 target_include_directories(http-server PRIVATE ${CMAKE_SOURCE_DIR})
 
-target_link_libraries(http-server PRIVATE http fd CLI11::CLI11 spdlog::spdlog fmt::fmt)
+target_link_libraries(http-server PRIVATE http fd ssl crypto CLI11::CLI11 spdlog::spdlog fmt::fmt)
 
 add_subdirectory(http)

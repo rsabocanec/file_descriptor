@@ -64,7 +64,7 @@ expected_result can_socket_frame::as_bytes(std::span<std::byte> buffer) const no
         std::copy_n(static_cast<const uint8_t*>(static_cast<const void*>(&frame)),
                     sizeof(frame),
                     static_cast<uint8_t*>(static_cast<void*>(buffer.data())));
-                    
+
         return expected_result{static_cast<int32_t>(sizeof(frame))};
     }
 
@@ -114,4 +114,4 @@ std::error_code can_socket::bind(std::string_view address) noexcept {
 
     return {};
 }
-} // descriptor
+} // namespace fd

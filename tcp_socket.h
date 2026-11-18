@@ -19,7 +19,69 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 #include "stream_socket.h"
 
+#include <mutex>
+
 namespace fd {
+
+namespace secure {
+class context {
+    struct implementation;
+    std::unique_ptr<implementation> impl_;
+
+public:
+    context();
+    ~context();
+
+    context(const context&) = delete;
+    context(context&&) = default;
+
+    context& operator=(const context&) = delete;
+    context& operator=(context&&) = default;
+
+    [[nodiscard]] expected_result init(int32_t descriptor, std::string_view certificate_path) noexcept;
+
+    [[nodiscard]] expected_result read(std::span<std::byte> buffer) const noexcept;
+    [[nodiscard]] expected_result write(std::span<const std::byte> buffer) const noexcept;
+
+private:
+    static std::once_flag init_flag_;
+    static std::once_flag deinit_flag_;
+    static std::atomic<std::size_t> instance_count_;
+};
+} // namespace secure
+
+class secure_acceptor : public acceptor {
+    secure::context context_{};
+public:
+    secure_acceptor() = delete;
+
+    explicit secure_acceptor(int32_t descriptor) noexcept
+    : acceptor(descriptor) {
+    }
+
+    explicit secure_acceptor(int32_t descriptor, std::string&& peer_address, uint16_t peer_port) noexcept
+    : acceptor(descriptor, std::forward<std::string>(peer_address), peer_port) {
+    }
+
+    secure_acceptor(const secure_acceptor&) = delete;
+    secure_acceptor(secure_acceptor&&) = default;
+
+    secure_acceptor& operator=(const secure_acceptor&) = delete;
+    secure_acceptor& operator=(secure_acceptor&&) = default;
+
+    [[nodiscard]] expected_result init_context(int32_t descriptor, std::string_view certificate_path) noexcept {
+        return context_.init(descriptor_.load(), certificate_path);
+    }
+
+    [[nodiscard]] expected_result read(std::span<std::byte> buffer) const noexcept final override {
+        return context_.read(buffer);
+    }
+
+    [[nodiscard]] expected_result write(std::span<const std::byte> buffer) const noexcept final override {
+        return context_.write(buffer);
+    }
+};
+
 
 class tcp_socket : public stream_socket {
 public:
@@ -42,6 +104,8 @@ public:
 
     [[nodiscard]] std::expected<acceptor, std::error_code> accept() const noexcept final;
 
+    [[nodiscard]] std::expected<secure_acceptor, std::error_code> secure_accept() const noexcept;
+
     [[nodiscard]] std::error_code connect(std::string_view address) noexcept final {
         auto const result = parse_ip_address(address);
         if (!result) {
@@ -56,7 +120,6 @@ public:
 protected:
     [[nodiscard]] std::error_code create() noexcept final;
 };
-
-} // descriptor
+} // namespacefd
 
 #endif //FD_TCP_SOCKET_H

@@ -25,6 +25,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 namespace fd {
 
 class acceptor : public socket {
+protected:
     std::string peer_address_{};
     uint16_t peer_port_{};
 
@@ -59,7 +60,7 @@ public:
         return peer_port_;
     }
 
-protected:    
+protected:
     [[nodiscard]] std::error_code create() noexcept final {
         return {};
     }
@@ -78,6 +79,6 @@ public:
     [[nodiscard]] std::error_code disconnect() noexcept;
 };
 
-} // descriptor
+} // namespace fd
 
 #endif //FD_STREAM_SOCKET_H

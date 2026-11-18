@@ -30,6 +30,6 @@ public:
     [[nodiscard]] virtual std::error_code bind(std::string_view address) noexcept = 0;
 };
 
-} // descriptor
+} // namespace fd
 
 #endif //FD_BOUND_SOCKET_H

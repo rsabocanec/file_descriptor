@@ -39,6 +39,9 @@ add_library(fd-static STATIC descriptor.cpp
         semaphores.cpp
         message_queue.cpp)
 
+    target_link_libraries(fd PRIVATE ssl crypto)
+    target_link_libraries(fd-static PRIVATE ssl crypto)
+
 if(SUPPORT_STACKTRACE)
     target_compile_definitions(fd PUBLIC _STACKTRACE_SUPPORTED)
     target_link_libraries(fd INTERFACE stdc++_libbacktrace)

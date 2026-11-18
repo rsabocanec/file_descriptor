@@ -49,7 +49,7 @@ public:
     socket() = default;
     explicit socket(int socket) : descriptor(socket) {}
 
-    [[nodiscard]] expected_result splice(const descriptor& source, std::size_t count, 
+    [[nodiscard]] expected_result splice(const descriptor& source, std::size_t count,
                                          std::optional<int32_t> offset_in = std::nullopt,
                                          [[maybe_unused]] std::optional<int32_t> offset_out = std::nullopt,
                                          [[maybe_unused]] uint32_t flags = 0ul) const noexcept final override {
@@ -59,10 +59,10 @@ public:
     [[nodiscard]] virtual std::error_code shutdown() const noexcept;
 
 protected:
-    [[nodiscard]] expected_result splice_impl(const descriptor& source, std::size_t count, 
+    [[nodiscard]] expected_result splice_impl(const descriptor& source, std::size_t count,
                                               std::optional<int32_t> offset = std::nullopt) const noexcept;
 };
 
-} // descriptor
+} // namespace fd
 
 #endif //FD_SOCKET_H

@@ -66,6 +66,6 @@ public:
         write_to(std::span<const std::byte> buffer, std::string_view address) noexcept = 0;
 };
 
-} // descriptor
+} // namespace fd
 
 #endif //FD_DATAGRAM_SOCKET_H
