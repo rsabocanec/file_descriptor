@@ -43,10 +43,6 @@ fd::expected_result get(std::string_view/* method*/,
     std::string full_path{"www"};
     full_path += path;
 
-    if (!full_path.ends_with('/')) {
-        full_path += '/';
-    }
-
     if (path == "/") {
         full_path += "index.html";
     }
@@ -60,7 +56,11 @@ fd::expected_result get(std::string_view/* method*/,
     }
 
     if (std::filesystem::is_directory(full_path)) {
-        full_path += "/index.html";
+        if (!full_path.ends_with('/')) {
+            full_path += '/';
+        }
+
+        full_path += "index.html";
         if (!std::filesystem::exists(full_path)) {
             return request::handle_error(404, acceptor);
         }
