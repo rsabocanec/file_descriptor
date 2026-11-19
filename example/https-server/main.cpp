@@ -16,10 +16,10 @@ namespace {
 
     fd::tcp_socket *g_server{nullptr};
 
-    // Create a self-signed certificate for a test with 
+    // Create a self-signed certificate for a test with
     //
     // openssl req -new -x509 -keyout ~/.ssh/selfsigned.key.pem -out ~/.ssh/selfsigned.cert.pem -days 365 -nodes
-    // 
+    //
     const std::string default_certificate_path{::getenv("HOME") + std::string("/.ssh/selfsigned")};
 }
 
@@ -87,10 +87,10 @@ fd::expected_result get(std::string_view/* method*/,
                          "Content-Length: " + std::to_string(content_size) + "\r\n"
                          "\r\n"};
 
-    response.reserve(response.size() + content_size);                             
+    response.reserve(response.size() + content_size);
 
-    std::copy(  std::istreambuf_iterator<char>(ifs), 
-                std::istreambuf_iterator<char>(), 
+    std::copy(  std::istreambuf_iterator<char>(ifs),
+                std::istreambuf_iterator<char>(),
                 std::back_inserter(response));
 
     return acceptor.write(response);
@@ -153,15 +153,15 @@ auto main(int argc, char** argv)->int {
                     logger->info("New connection from {}:{}", acceptor.peer(), acceptor.peer_port());
 
                     if (auto const init_result = acceptor.init_context(default_certificate_path); !init_result) {
-                        logger->error("Failed to initialize secure context, error is {}({})", 
+                        logger->error("Failed to initialize secure context, error is {}({})",
                                         init_result.error().value(), init_result.error().message());
                     }
                     else {
                         std::array<char, 4096ull * 4ull> receive_buffer{};
 
-                        fd::acceptor &acceptor_ref{acceptor};
-
-                        auto const read_result = acceptor_ref.read(receive_buffer);
+                        fd::descriptor &descriptor{acceptor};
+                        
+                        auto const read_result = descriptor.read(receive_buffer);
 
                         if (!read_result) {
                             logger->error("Receive failed; {} '{}'",
@@ -196,7 +196,7 @@ auto main(int argc, char** argv)->int {
                     [[maybe_unused]] auto shutdown_result = acceptor.shutdown();
 
                     logger->info("Client {}:{} disconnected!", acceptor.peer(), acceptor.peer_port());
-                    
+
                     logger->flush();
 
                 }, std::move(accept_result.value())).detach();

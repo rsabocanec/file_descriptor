@@ -25,12 +25,12 @@ class local_stream_socket : public stream_socket {
 public:
     local_stream_socket() = default;
 
-    [[nodiscard]] std::error_code bind(std::string_view address) noexcept final;
-    [[nodiscard]] std::expected<acceptor, std::error_code> accept() const noexcept final;
-    [[nodiscard]] std::error_code connect(std::string_view address) noexcept final;
+    [[nodiscard]] std::error_code bind(std::string_view address) noexcept final override;
+    [[nodiscard]] std::expected<acceptor, std::error_code> accept() const noexcept final override;
+    [[nodiscard]] std::error_code connect(std::string_view address) noexcept final override;
 
 protected:
-    [[nodiscard]] std::error_code create() noexcept final;
+    [[nodiscard]] std::error_code create() noexcept final override;
 };
 
 } // namespace fd

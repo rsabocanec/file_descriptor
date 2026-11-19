@@ -69,6 +69,8 @@ public:
     secure_acceptor& operator=(const secure_acceptor&) = delete;
     secure_acceptor& operator=(secure_acceptor&&) = default;
 
+    ~secure_acceptor() override = default;
+
     [[nodiscard]] expected_result init_context(std::string_view certificate_path) noexcept {
         return context_.init(descriptor_.load(), certificate_path);
     }
@@ -87,7 +89,7 @@ class tcp_socket : public stream_socket {
 public:
     tcp_socket() = default;
 
-    [[nodiscard]] std::error_code bind(std::string_view address) noexcept final {
+    [[nodiscard]] std::error_code bind(std::string_view address) noexcept final override {
         auto const result = parse_ip_address(address);
         if (!result) {
             return result.error();
@@ -102,11 +104,11 @@ public:
 
     [[nodiscard]] std::error_code bind(std::string_view address, uint16_t port) noexcept;
 
-    [[nodiscard]] std::expected<acceptor, std::error_code> accept() const noexcept final;
+    [[nodiscard]] std::expected<acceptor, std::error_code> accept() const noexcept final override;
 
     [[nodiscard]] std::expected<secure_acceptor, std::error_code> secure_accept() const noexcept;
 
-    [[nodiscard]] std::error_code connect(std::string_view address) noexcept final {
+    [[nodiscard]] std::error_code connect(std::string_view address) noexcept final override {
         auto const result = parse_ip_address(address);
         if (!result) {
             return result.error();
@@ -118,7 +120,7 @@ public:
     [[nodiscard]] std::error_code connect(std::string_view address, uint16_t port) noexcept;
 
 protected:
-    [[nodiscard]] std::error_code create() noexcept final;
+    [[nodiscard]] std::error_code create() noexcept final override;
 };
 } // namespacefd
 

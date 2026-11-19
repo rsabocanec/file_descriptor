@@ -48,7 +48,7 @@ public:
     acceptor& operator=(const acceptor&) = delete;
     acceptor& operator=(acceptor&&) = default;
 
-    ~acceptor() noexcept override {
+    virtual ~acceptor() override {
         [[maybe_unused]] auto const result = socket::shutdown();
     }
 
@@ -61,7 +61,7 @@ public:
     }
 
 protected:
-    [[nodiscard]] std::error_code create() noexcept final {
+    [[nodiscard]] std::error_code create() noexcept final override {
         return {};
     }
 };

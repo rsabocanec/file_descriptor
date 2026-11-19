@@ -25,16 +25,16 @@ class local_datagram_socket : public datagram_socket {
 public:
     local_datagram_socket() = default;
 
-    [[nodiscard]] std::error_code bind(std::string_view address) noexcept final;
+    [[nodiscard]] std::error_code bind(std::string_view address) noexcept final override;
 
     [[nodiscard]] expected_result
-        read_from(std::span<std::byte> buffer, std::string &address) noexcept final;
+        read_from(std::span<std::byte> buffer, std::string &address) noexcept final override;
 
     [[nodiscard]] expected_result
-        write_to(std::span<const std::byte> buffer, std::string_view address) noexcept final;
+        write_to(std::span<const std::byte> buffer, std::string_view address) noexcept final override;
 
 protected:
-    [[nodiscard]] std::error_code create() noexcept final;
+    [[nodiscard]] std::error_code create() noexcept final override;
 };
 
 } // namespace fd

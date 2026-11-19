@@ -30,7 +30,7 @@ class udp_socket : public datagram_socket {
 public:
     udp_socket() = default;
 
-    [[nodiscard]] std::error_code bind(std::string_view address) noexcept final {
+    [[nodiscard]] std::error_code bind(std::string_view address) noexcept final override {
         auto const result = parse_ip_address(address);
         if (!result) {
             return result.error();
@@ -46,7 +46,7 @@ public:
     [[nodiscard]] std::error_code bind(std::string_view address, uint16_t port) noexcept;
 
     [[nodiscard]] expected_result
-        read_from(std::span<std::byte> buffer, std::string &address) noexcept final {
+        read_from(std::span<std::byte> buffer, std::string &address) noexcept final override {
         std::string pure_address{};
         uint16_t port = 0;
 
@@ -83,7 +83,7 @@ public:
         read_from(std::span<std::byte> buffer, std::string &address, uint16_t &port) noexcept;
 
     [[nodiscard]] expected_result
-        write_to(std::span<const std::byte> buffer, std::string_view address) noexcept final {
+        write_to(std::span<const std::byte> buffer, std::string_view address) noexcept final override {
         auto const result = parse_ip_address(address);
         if (!result) {
             return std::unexpected(result.error());
@@ -116,7 +116,7 @@ public:
         write_to(std::span<const std::byte> buffer, std::string_view address, uint16_t port) noexcept;
 
 protected:
-    [[nodiscard]] std::error_code create() noexcept final;
+    [[nodiscard]] std::error_code create() noexcept final override;
 };
 
 } // namespace fd

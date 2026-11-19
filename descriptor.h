@@ -246,9 +246,6 @@ public:
     Descriptor& load() noexcept {
         return weak_descriptor_;
     }
-
-    //[[nodiscard]] std::error_code set_nonblocking(bool nonblocking) const noexcept;
-    //[[nodiscard]] std::error_code set_close_on_exec(bool close_on_exec) const noexcept;
 };
 
 // Utility functions

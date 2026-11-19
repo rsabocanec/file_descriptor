@@ -121,7 +121,7 @@ public:
     }
 
 protected:
-    [[nodiscard]] std::error_code create() noexcept final {
+    [[nodiscard]] std::error_code create() noexcept final override {
         return {};
     }
 };
