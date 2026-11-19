@@ -24,9 +24,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 namespace fd {
 
 class udp_socket : public datagram_socket {
-    
+
     bool bound_socket_{false};
-    
+
 public:
     udp_socket() = default;
 
@@ -37,6 +37,10 @@ public:
         }
 
         return bind(std::get<0>(result.value()), std::get<1>(result.value()));
+    }
+
+    [[nodiscard]] std::error_code bind(uint16_t port) noexcept {
+        return bind({}, port);
     }
 
     [[nodiscard]] std::error_code bind(std::string_view address, uint16_t port) noexcept;
@@ -98,6 +102,11 @@ public:
         return write_to(std::as_bytes(std::span(first, last)), address, port);
     }
 
+    template<contiguous_container C>
+    [[nodiscard]] expected_result write_to(const C& container, std::string_view address, uint16_t port) const noexcept {
+        return write_to(std::cbegin(container), std::cend(container), address, port);
+    }
+
     template<class U, std::size_t N>
     [[nodiscard]] expected_result write_to(const std::array<U, N>& arr, std::string_view address, uint16_t port) noexcept {
         return write_to(std::as_bytes(std::span(arr)), address, port);
@@ -110,6 +119,6 @@ protected:
     [[nodiscard]] std::error_code create() noexcept final;
 };
 
-} // descriptor
+} // namespace fd
 
 #endif //FD_UDP_SOCKET_H

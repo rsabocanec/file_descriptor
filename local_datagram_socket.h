@@ -37,6 +37,6 @@ protected:
     [[nodiscard]] std::error_code create() noexcept final;
 };
 
-} // descriptor
+} // namespace fd
 
 #endif //FD_LOCAL_DATAGRAM_SOCKET_H

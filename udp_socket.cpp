@@ -106,7 +106,7 @@ expected_result udp_socket::read_from(
 
 expected_result udp_socket::write_to(
         std::span<const std::byte> buffer, std::string_view address, uint16_t port) noexcept {
-    
+
     auto const descriptor = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (descriptor == -1) {
         return std::unexpected(std::make_error_code(std::errc::bad_file_descriptor));
@@ -133,7 +133,7 @@ expected_result udp_socket::write_to(
         [[maybe_unused]] auto const close_result = ::close(descriptor);
     }
 
-    return result != -1 ? expected_result{result} 
+    return result != -1 ? expected_result{result}
                         : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
 }
-} // descriptor
+} // namespace fd

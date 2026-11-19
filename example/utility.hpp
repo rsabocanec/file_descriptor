@@ -13,12 +13,33 @@
 
 namespace fd::example::utility {
 
+    class application_option {
+        std::string name_;
+        bool required_{true};
+
+    public:
+        application_option(const std::string &name)
+        : name_(name) {}
+
+        application_option(const std::string &name, bool required)
+        : name_(name)
+        , required_(required) {}
+
+        const std::string &name() const noexcept {
+            return name_;
+        }
+
+        bool required() const noexcept {
+            return required_;
+        }
+    };
+
     inline std::tuple<std::shared_ptr<spdlog::logger>, std::unique_ptr<CLI::App>> init_app(
-        int argc, char **argv, 
-        const std::vector<std::string> &app_options,
-        std::string_view app_description, 
+        int argc, char **argv,
+        const std::vector<application_option> &app_options,
+        std::string_view app_description,
         std::string_view logger_name = "logger") {
-        
+
         std::shared_ptr<spdlog::logger> logger{};
 
         try {
@@ -32,20 +53,20 @@ namespace fd::example::utility {
         auto app = std::make_unique<CLI::App>(std::string(app_description));
 
         for (const auto &option : app_options) {
-            app->add_option(option)
-            ->required();
+            app->add_option(option.name())
+            ->required(option.required());
         }
 
         app->add_flag_function("-v,--verbose", [logger](long int) {
             logger->set_level(spdlog::level::debug);
         }, "Set verbosity");
 
-        try {                     
+        try {
             app->parse(argc, argv);
         }
         catch(const CLI::ParseError &e) {
             logger->error("Error parsing command line arguments: {}", e.what());
-            std::exit(EXIT_FAILURE);
+            std::exit(app->exit(e));
         }
 
         return {logger, std::move(app)};

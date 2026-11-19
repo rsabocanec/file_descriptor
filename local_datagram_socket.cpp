@@ -91,10 +91,10 @@ expected_result local_datagram_socket::write_to(
                     static_cast<const struct sockaddr *>(static_cast<const void *>(&local_address)),
                     sizeof(local_address.sun_family) + address.length());
 
-        return result != -1 ? expected_result{static_cast<int32_t>(result)} 
-                            : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));    
+        return result != -1 ? expected_result{static_cast<int32_t>(result)}
+                            : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
     }
 
     return std::unexpected(std::make_error_code(std::errc::bad_file_descriptor));
 }
-} // descriptor
+} // namespace fd

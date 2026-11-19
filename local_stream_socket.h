@@ -33,6 +33,6 @@ protected:
     [[nodiscard]] std::error_code create() noexcept final;
 };
 
-} // descriptor
+} // namespace fd
 
 #endif //FD_LOCAL_STREAM_SOCKET_H

@@ -156,11 +156,11 @@ public:
     can_socket() = default;
 
     [[nodiscard]] std::error_code bind(std::string_view address) noexcept final;
-    
+
 protected:
     [[nodiscard]] std::error_code create() noexcept final;
 };
 
-} // descriptor
+} // namespace fd
 
 #endif //FD_CAN_SOCKET_H

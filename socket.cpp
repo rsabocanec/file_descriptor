@@ -17,11 +17,11 @@ expected_result socket::splice_impl(const descriptor& source, std::size_t count,
     if (descriptor_.load() != -1) {
         auto const result =
             ::sendfile(descriptor_.load(),
-                       source.load(),  
-                       offset ? &offset_value : nullptr, 
+                       source.load(),
+                       offset ? &offset_value : nullptr,
                        count);
 
-        return result != -1 ? expected_result{result} 
+        return result != -1 ? expected_result{result}
                             : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
     }
 
@@ -38,4 +38,4 @@ std::error_code socket::shutdown() const noexcept {
     return {};
 }
 
-} // descriptor
+} // namespace fd
