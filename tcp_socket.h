@@ -33,10 +33,10 @@ public:
     ~context();
 
     context(const context&) = delete;
-    context(context&&) = default;
+    context(context&&);
 
     context& operator=(const context&) = delete;
-    context& operator=(context&&) = default;
+    context& operator=(context&&);
 
     [[nodiscard]] expected_result init(int32_t descriptor, std::string_view certificate_path) noexcept;
 
@@ -69,7 +69,7 @@ public:
     secure_acceptor& operator=(const secure_acceptor&) = delete;
     secure_acceptor& operator=(secure_acceptor&&) = default;
 
-    [[nodiscard]] expected_result init_context(int32_t descriptor, std::string_view certificate_path) noexcept {
+    [[nodiscard]] expected_result init_context(std::string_view certificate_path) noexcept {
         return context_.init(descriptor_.load(), certificate_path);
     }
 

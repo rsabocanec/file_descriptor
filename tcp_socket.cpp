@@ -174,17 +174,24 @@ struct secure::context::implementation {
 
         auto const options = SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1;
         auto const result = ::SSL_CTX_set_options(ssl_ctx_, options);
-        assert(result & options == options);
+        assert((result & options) == options);
 
-        if (result & options != options) {
+        if ((result & options) != options) {
             return std::unexpected(std::make_error_code(std::errc::operation_not_permitted));
         }
 
-        if (auto const result = ::SSL_CTX_use_certificate_file(ssl_ctx_, certificate_path.data(), SSL_FILETYPE_PEM); result != 1) {
+        std::string certificate{certificate_path};
+        certificate += ".cert.pem";
+
+        if (auto const result = ::SSL_CTX_use_certificate_file(ssl_ctx_, certificate.c_str(), SSL_FILETYPE_PEM); result != 1) {
             return std::unexpected(std::make_error_code(std::errc::no_such_file_or_directory));
         }
 
-        if (auto const result = ::SSL_CTX_use_PrivateKey_file(ssl_ctx_, certificate_path.data(), SSL_FILETYPE_PEM); result != 1) {
+
+        std::string private_key{certificate_path};
+        private_key += ".key.pem";
+
+        if (auto const result = ::SSL_CTX_use_PrivateKey_file(ssl_ctx_, private_key.c_str(), SSL_FILETYPE_PEM); result != 1) {
             return std::unexpected(std::make_error_code(std::errc::no_such_file_or_directory));
         }
 
@@ -259,6 +266,11 @@ secure::context::context() {
 
     impl_ = std::make_unique<implementation>();
 }
+
+secure::context::context(context&&) = default;
+
+secure::context& secure::context::operator=(context&&) = default;
+
 
 secure::context::~context() {
     if (--instance_count_ == 0) {

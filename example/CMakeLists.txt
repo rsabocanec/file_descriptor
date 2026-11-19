@@ -58,4 +58,6 @@ add_subdirectory(message-queue-subscriber)
 
 add_subdirectory(memory-file)
 
+add_subdirectory(http)
 add_subdirectory(http-server)
+add_subdirectory(https-server)
