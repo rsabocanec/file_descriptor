@@ -164,7 +164,7 @@ auto main(int argc, char** argv)->int {
                         http::request request{};
                         request.set_get_handler(http::handler::get);
 
-                        const fd::expected_result send_response = request.handle(received, std::move(acceptor), logger);
+                        const fd::expected_result send_response = request.handle(received, acceptor, logger);
 
                         if (!send_response) {
                             logger->error("Response failed; {} '{}'",
@@ -174,6 +174,15 @@ auto main(int argc, char** argv)->int {
                             logger->info("Sent '{}'", send_response.value());
                         }
                     }
+
+                    logger->info("Shutting down the acceptor!");
+
+                    [[maybe_unused]] auto shutdown_result = acceptor.shutdown();
+
+                    logger->info("Client {}:{} disconnected!", acceptor.peer(), acceptor.peer_port());
+
+                    logger->flush();
+                    
                 }, std::move(accept_result.value())).detach();
 
                 accept_result = server.accept();

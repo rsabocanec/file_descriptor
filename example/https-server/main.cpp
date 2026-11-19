@@ -7,6 +7,8 @@
 #include <array>
 #include <span>
 #include <atomic>
+#include <iterator>
+
 #include <csignal>
 
 namespace {
@@ -14,7 +16,11 @@ namespace {
 
     fd::tcp_socket *g_server{nullptr};
 
-    constexpr std::string_view default_certificate_path{"~/.ssh/selfsigned"};
+    // Create a self-signed certificate for a test with 
+    //
+    // openssl req -new -x509 -keyout ~/.ssh/selfsigned.key.pem -out ~/.ssh/selfsigned.cert.pem -days 365 -nodes
+    // 
+    const std::string default_certificate_path{::getenv("HOME") + std::string("/.ssh/selfsigned")};
 }
 
 void signal_handler(int signal) {
@@ -68,26 +74,26 @@ fd::expected_result get(std::string_view/* method*/,
         }
     }
 
-    fd::file file{};
-
-    if (auto result = file.open(full_path, fd::open_flags::read_only); result) {
-        logger->error("Failed to open file {} with result {} '{}'",
-                        full_path, result.value(), result.message());
+    std::ifstream ifs{full_path};
+    if (!ifs) {
+        logger->error("Failed to open file {}!", full_path);
         return request::handle_error(404, acceptor);
     }
 
+    const auto content_size{std::filesystem::file_size(full_path)};
+
     std::string response{"HTTP/1.1 200 OK\r\n"
                          "Content-Type: text/html\r\n"
-                         "Content-Length: " + std::to_string(file.size()) + "\r\n"
+                         "Content-Length: " + std::to_string(content_size) + "\r\n"
                          "\r\n"};
 
-    if (auto result = acceptor.write(response); !result) {
-        logger->error("Failed to send response header with result {} '{}'",
-                        result.error().value(), result.error().message());
-        return request::handle_error(500, acceptor);
-    }
+    response.reserve(response.size() + content_size);                             
 
-    return acceptor.splice(file, file.size());
+    std::copy(  std::istreambuf_iterator<char>(ifs), 
+                std::istreambuf_iterator<char>(), 
+                std::back_inserter(response));
+
+    return acceptor.write(response);
 }
 } // namespace fd::example::http::handler
 
@@ -149,11 +155,9 @@ auto main(int argc, char** argv)->int {
                     if (auto const init_result = acceptor.init_context(default_certificate_path); !init_result) {
                         logger->error("Failed to initialize secure context, error is {}({})", 
                                         init_result.error().value(), init_result.error().message());
-
-                        logger->info("Shutting down the acceptor!");
                     }
                     else {
-                        std::array<char, 4096> receive_buffer{};
+                        std::array<char, 4096ull * 4ull> receive_buffer{};
 
                         fd::acceptor &acceptor_ref{acceptor};
 
@@ -175,7 +179,7 @@ auto main(int argc, char** argv)->int {
                             http::request request{};
                             request.set_get_handler(http::handler::get);
 
-                            const fd::expected_result send_response = request.handle(received, std::move(acceptor), logger);
+                            const fd::expected_result send_response = request.handle(received, acceptor, logger);
 
                             if (!send_response) {
                                 logger->error("Response failed; {} '{}'",
@@ -186,6 +190,15 @@ auto main(int argc, char** argv)->int {
                             }
                         }
                     }
+
+                    logger->info("Shutting down the acceptor!");
+
+                    [[maybe_unused]] auto shutdown_result = acceptor.shutdown();
+
+                    logger->info("Client {}:{} disconnected!", acceptor.peer(), acceptor.peer_port());
+                    
+                    logger->flush();
+
                 }, std::move(accept_result.value())).detach();
 
                 accept_result = server.secure_accept();

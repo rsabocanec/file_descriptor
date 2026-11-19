@@ -9,7 +9,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/example/https-server/https-server",
-      "args": ["--port", "8444"],
+      "args": ["--port", "8443"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/example",
       "environment": [],

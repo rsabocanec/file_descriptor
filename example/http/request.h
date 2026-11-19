@@ -81,7 +81,7 @@ public:
     ~request() = default;
 
     [[nodiscard]] fd::expected_result handle(std::string_view request,
-                                             fd::acceptor&& acceptor,
+                                             const fd::acceptor& acceptor,
                                              std::shared_ptr<spdlog::logger> logger) noexcept;
 
     void set_get_handler(request_handler handler) noexcept {

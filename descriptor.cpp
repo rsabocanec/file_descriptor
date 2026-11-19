@@ -70,7 +70,6 @@ std::error_code descriptor::duplicate(int32_t other) noexcept {
 
 
 expected_result descriptor::read(std::span<std::byte> buffer) const noexcept {
-
     if (descriptor_.load() != -1) {
         auto const result =
             ::read(descriptor_.load(),

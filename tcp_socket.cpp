@@ -172,7 +172,11 @@ struct secure::context::implementation {
             return std::unexpected(std::make_error_code(std::errc::not_enough_memory));
         }
 
-        auto const options = SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1;
+        auto const options  = SSL_OP_NO_SSLv2 
+                            | SSL_OP_NO_SSLv3 
+                            | SSL_OP_NO_TLSv1 
+                            | SSL_OP_NO_TLSv1_1;
+
         auto const result = ::SSL_CTX_set_options(ssl_ctx_, options);
         assert((result & options) == options);
 
@@ -184,15 +188,14 @@ struct secure::context::implementation {
         certificate += ".cert.pem";
 
         if (auto const result = ::SSL_CTX_use_certificate_file(ssl_ctx_, certificate.c_str(), SSL_FILETYPE_PEM); result != 1) {
-            return std::unexpected(std::make_error_code(std::errc::no_such_file_or_directory));
+            return std::unexpected(std::make_error_code(static_cast<std::errc>(ERR_get_error())));
         }
-
 
         std::string private_key{certificate_path};
         private_key += ".key.pem";
 
         if (auto const result = ::SSL_CTX_use_PrivateKey_file(ssl_ctx_, private_key.c_str(), SSL_FILETYPE_PEM); result != 1) {
-            return std::unexpected(std::make_error_code(std::errc::no_such_file_or_directory));
+            return std::unexpected(std::make_error_code(static_cast<std::errc>(ERR_get_error())));
         }
 
         if (ssl_ != nullptr) {
@@ -216,7 +219,7 @@ struct secure::context::implementation {
 
         if (auto result = ::SSL_accept(ssl_); result != 1) {
             result = destroy_ssl();
-            return std::unexpected(std::make_error_code(std::errc::operation_not_supported));
+            return std::unexpected(std::make_error_code(static_cast<std::errc>(ERR_get_error())));
         }
 
         return {};

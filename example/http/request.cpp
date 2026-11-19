@@ -9,52 +9,42 @@
 namespace fd::example::http {
 
 [[nodiscard]] fd::expected_result request::handle(std::string_view request,
-                                                  fd::acceptor&& acceptor,
+                                                  const fd::acceptor& acceptor,
                                                   std::shared_ptr<spdlog::logger> logger) noexcept  {
-
-    auto responder = std::forward<fd::acceptor>(acceptor);
 
     fd::expected_result result = {};
 
     if (!parse(request, logger)) {
-        result = handle_error(400, responder);
+        result = handle_error(400, acceptor);
     }
 
     if (method_ == "GET") {
-        result = get_handler_(method_, path_, version_, header_, body_, responder, logger);
+        result = get_handler_(method_, path_, version_, header_, body_, acceptor, logger);
     }
     else if (method_ == "POST") {
-        result = post_handler_(method_, path_, version_, header_, body_, responder, logger);
+        result = post_handler_(method_, path_, version_, header_, body_, acceptor, logger);
     }
     else if (method_ == "PUT") {
-        result = put_handler_(method_, path_, version_, header_, body_, responder, logger);
+        result = put_handler_(method_, path_, version_, header_, body_, acceptor, logger);
     }
     else if (method_ == "DELETE") {
-        result = delete_handler_(method_, path_, version_, header_, body_, responder, logger);
+        result = delete_handler_(method_, path_, version_, header_, body_, acceptor, logger);
     }
     else if (method_ == "HEAD") {
-        result = head_handler_(method_, path_, version_, header_, body_, responder, logger);
+        result = head_handler_(method_, path_, version_, header_, body_, acceptor, logger);
     }
     else if (method_ == "OPTIONS") {
-        result = options_handler_(method_, path_, version_, header_, body_, responder, logger);
+        result = options_handler_(method_, path_, version_, header_, body_, acceptor, logger);
     }
     else if (method_ == "PATCH") {
-        result = patch_handler_(method_, path_, version_, header_, body_, responder, logger);
+        result = patch_handler_(method_, path_, version_, header_, body_, acceptor, logger);
     }
     else if (method_ == "TRACE") {
-        result = trace_handler_(method_, path_, version_, header_, body_, responder, logger);
+        result = trace_handler_(method_, path_, version_, header_, body_, acceptor, logger);
     }
     else {
-        result = handle_error(501, responder);
+        result = handle_error(501, acceptor);
     }
-
-    logger->info("Shutting down the acceptor!");
-
-    [[maybe_unused]] auto shutdown_result = responder.shutdown();
-
-    logger->info("Client {}:{} disconnected!", responder.peer(), responder.peer_port());
-
-    logger->flush();
 
     return result;
 }
