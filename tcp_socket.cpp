@@ -172,9 +172,9 @@ struct secure::context::implementation {
             return std::unexpected(std::make_error_code(std::errc::not_enough_memory));
         }
 
-        auto const options  = SSL_OP_NO_SSLv2 
-                            | SSL_OP_NO_SSLv3 
-                            | SSL_OP_NO_TLSv1 
+        auto const options  = SSL_OP_NO_SSLv2
+                            | SSL_OP_NO_SSLv3
+                            | SSL_OP_NO_TLSv1
                             | SSL_OP_NO_TLSv1_1;
 
         auto const result = ::SSL_CTX_set_options(ssl_ctx_, options);
@@ -225,14 +225,10 @@ struct secure::context::implementation {
         return {};
     }
 
-    [[nodiscard]] expected_result read(std::span<std::byte> buffer) const noexcept {
+    [[nodiscard]] expected_result read(void *buffer, std::size_t buffer_size) const noexcept {
         if (ssl_ != nullptr) {
             std::size_t bytes_read{};
-            auto const result =
-                ::SSL_read_ex(ssl_,
-                              static_cast<void*>(buffer.data()),
-                              static_cast<std::size_t>(buffer.size()),
-                              &bytes_read);
+            auto const result = ::SSL_read_ex(ssl_, buffer, buffer_size, &bytes_read);
 
             return result > 0 ? expected_result{static_cast<int32_t>(bytes_read)}
                               : std::unexpected(std::make_error_code(std::errc::invalid_argument));
@@ -241,14 +237,10 @@ struct secure::context::implementation {
         return std::unexpected(std::make_error_code(std::errc::bad_file_descriptor));
     }
 
-    [[nodiscard]] expected_result write(std::span<const std::byte> buffer) const noexcept {
+    [[nodiscard]] expected_result write(const void *buffer, std::size_t buffer_size) const noexcept {
         if (ssl_ != nullptr) {
             std::size_t bytes_written{};
-            auto const result =
-                ::SSL_write_ex(ssl_,
-                               static_cast<const void*>(buffer.data()),
-                               static_cast<std::size_t>(buffer.size()),
-                               &bytes_written);
+            auto const result = ::SSL_write_ex(ssl_, buffer, buffer_size, &bytes_written);
 
             return result > 0 ? expected_result{static_cast<int32_t>(bytes_written)}
                               : std::unexpected(std::make_error_code(std::errc::invalid_argument));
@@ -288,12 +280,11 @@ expected_result secure::context::init(int32_t descriptor, std::string_view certi
     return impl_->init(descriptor, certificate_path);
 }
 
-expected_result secure::context::read(std::span<std::byte> buffer) const noexcept {
-    return impl_->read(buffer);
+expected_result secure::context::read(void *buffer, std::size_t buffer_size) const noexcept {
+    return impl_->read(buffer, buffer_size);
 }
 
-expected_result secure::context::write(std::span<const std::byte> buffer) const noexcept {
-    return impl_->write(buffer);
+expected_result secure::context::write(const void *buffer, std::size_t buffer_size) const noexcept {
+    return impl_->write(buffer, buffer_size);
 }
-
 } // namespace fd

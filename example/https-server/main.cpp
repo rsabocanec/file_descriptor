@@ -159,9 +159,7 @@ auto main(int argc, char** argv)->int {
                     else {
                         std::array<char, 4096ull * 4ull> receive_buffer{};
 
-                        fd::descriptor &descriptor{acceptor};
-                        
-                        auto const read_result = descriptor.read(receive_buffer);
+                        auto const read_result = acceptor.read(receive_buffer);
 
                         if (!read_result) {
                             logger->error("Receive failed; {} '{}'",

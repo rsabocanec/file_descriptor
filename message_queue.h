@@ -51,8 +51,6 @@ public:
 
     [[nodiscard]] std::error_code close() noexcept final override;
 
-    [[nodiscard]] expected_result read(std::span<std::byte> buffer) const noexcept final override;
-
     template<std::random_access_iterator It, typename Period>
     [[nodiscard]] expected_result timed_read(It first, std::size_t count, duration<Period> &&timeout) const noexcept {
         return timed_read(std::as_writable_bytes(std::span(first, count)), std::forward<Period>(timeout));
@@ -72,8 +70,6 @@ public:
     [[nodiscard]] expected_result timed_read(std::span<std::byte> buffer, duration<Period> &&timeout) const noexcept {
         return timed_read(buffer, std::chrono::duration_cast<std::chrono::nanoseconds>(timeout).count());
     }
-
-    [[nodiscard]] expected_result write(std::span<const std::byte> buffer) const noexcept final override;
 
     template<std::random_access_iterator It, typename Period>
     [[nodiscard]] expected_result timed_write(It first, std::size_t count, duration<Period> &&timeout) const noexcept {
@@ -104,6 +100,10 @@ public:
 protected:
     [[nodiscard]] expected_result timed_read(std::span<std::byte> buffer, int64_t timeout_nanoseconds) const noexcept;
     [[nodiscard]] expected_result timed_write(std::span<const std::byte> buffer, int64_t timeout_nanoseconds) const noexcept;
+
+    [[nodiscard]] expected_result read_impl(void *buffer, std::size_t buffer_size) const noexcept final override;
+    [[nodiscard]] expected_result write_impl(const void *buffer, std::size_t buffer_size) const noexcept final override;
+
 };
 }
 #endif //FD_MESSAGE_QUEUE_H

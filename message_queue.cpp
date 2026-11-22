@@ -1,7 +1,7 @@
 #include "message_queue.h"
 
 #include <fcntl.h>
-#include <sys/stat.h> 
+#include <sys/stat.h>
 #include <mqueue.h>
 #include <signal.h>
 #include <limits.h>
@@ -63,17 +63,15 @@ std::error_code message_queue::close() noexcept {
     return {};
 }
 
-expected_result message_queue::read(std::span<std::byte> buffer) const noexcept {
+expected_result message_queue::read_impl(void *buffer, std::size_t buffer_size) const noexcept {
 
     if (descriptor_.load() != -1) {
         [[maybe_unused]] unsigned int priority{};
-        auto const result =
-            ::mq_receive(descriptor_.load(),
-                    static_cast<char*>(static_cast<void*>(buffer.data())),
-                    static_cast<std::size_t>(buffer.size()),
-                    &priority);
+        auto const result = ::mq_receive(descriptor_.load(),
+                                         static_cast<char*>(buffer),
+                                         buffer_size, &priority);
 
-        return result != -1 ? expected_result{result} 
+        return result != -1 ? expected_result{result}
                             : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
     }
 
@@ -89,32 +87,30 @@ expected_result message_queue::timed_read(std::span<std::byte> buffer, int64_t t
         ::clock_gettime(CLOCK_REALTIME, &tm);
         tm.tv_sec += timeout_nanoseconds / 1'000'000'000;
         tm.tv_nsec += timeout_nanoseconds % 1'000'000'000;
-    
+
         auto const result =
             ::mq_timedreceive(descriptor_.load(),
                     static_cast<char*>(static_cast<void*>(buffer.data())),
                     static_cast<std::size_t>(buffer.size()),
                     &priority, &tm);
 
-        return result != -1 ? expected_result{result} 
+        return result != -1 ? expected_result{result}
                             : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
     }
 
     return std::unexpected(std::make_error_code(std::errc::bad_file_descriptor));
 }
 
-expected_result message_queue::write(std::span<const std::byte> buffer) const noexcept {
+expected_result message_queue::write_impl(const void *buffer, std::size_t buffer_size) const noexcept {
 
     if (descriptor_.load() != -1) {
         [[maybe_unused]] const unsigned int priority{};
-        
-        auto const send_result =
-            ::mq_send(descriptor_.load(),
-                      static_cast<const char*>(static_cast<const void*>(buffer.data())),
-                      static_cast<std::size_t>(buffer.size()),
-                      priority);
 
-        return send_result != -1 ? expected_result{static_cast<int32_t>(buffer.size())} 
+        auto const send_result = ::mq_send(descriptor_.load(),
+                                           static_cast<const char*>(buffer), buffer_size,
+                                           priority);
+
+        return send_result != -1 ? expected_result{static_cast<int32_t>(buffer_size)}
                                  : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
     }
 
@@ -137,7 +133,7 @@ expected_result message_queue::timed_write(std::span<const std::byte> buffer, in
                            static_cast<std::size_t>(buffer.size()),
                            priority, &tm);
 
-        return send_result != -1 ? expected_result{static_cast<int32_t>(buffer.size())} 
+        return send_result != -1 ? expected_result{static_cast<int32_t>(buffer.size())}
                                  : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
     }
 

@@ -40,8 +40,8 @@ public:
 
     [[nodiscard]] expected_result init(int32_t descriptor, std::string_view certificate_path) noexcept;
 
-    [[nodiscard]] expected_result read(std::span<std::byte> buffer) const noexcept;
-    [[nodiscard]] expected_result write(std::span<const std::byte> buffer) const noexcept;
+    [[nodiscard]] expected_result read(void *buffer, std::size_t buffer_size) const noexcept;
+    [[nodiscard]] expected_result write(const void *buffer, std::size_t buffer_size) const noexcept;
 
 private:
     static std::once_flag init_flag_;
@@ -75,12 +75,13 @@ public:
         return context_.init(descriptor_.load(), certificate_path);
     }
 
-    [[nodiscard]] expected_result read(std::span<std::byte> buffer) const noexcept final override {
-        return context_.read(buffer);
+protected:
+    [[nodiscard]] expected_result read_impl(void *buffer, std::size_t buffer_size) const noexcept final override {
+        return context_.read(buffer, buffer_size);
     }
 
-    [[nodiscard]] expected_result write(std::span<const std::byte> buffer) const noexcept final override {
-        return context_.write(buffer);
+    [[nodiscard]] expected_result write_impl(const void *buffer, std::size_t buffer_size) const noexcept final override {
+        return context_.write(buffer, buffer_size);
     }
 };
 

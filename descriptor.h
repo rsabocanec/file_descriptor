@@ -163,7 +163,10 @@ public:
         return read(std::as_writable_bytes(std::span(arr)));
     }
 
-    [[nodiscard]] virtual expected_result read(std::span<std::byte> buffer) const noexcept;
+    [[nodiscard]] expected_result read(std::span<std::byte> buffer) const noexcept {
+        return read_impl(static_cast<void*>(buffer.data()),
+                         static_cast<std::size_t>(buffer.size()));
+    }
 
     template<std::random_access_iterator It>
     [[nodiscard]] expected_result write(It first, std::size_t count) const noexcept {
@@ -185,7 +188,10 @@ public:
         return write(std::as_bytes(std::span(arr)));
     }
 
-    [[nodiscard]] virtual expected_result write(std::span<const std::byte> buffer) const noexcept;
+    [[nodiscard]] expected_result write(std::span<const std::byte> buffer) const noexcept {
+        return write_impl(static_cast<const void*>(buffer.data()),
+                          static_cast<std::size_t>(buffer.size()));
+    }
 
     [[nodiscard]] virtual expected_result splice(const descriptor& source, std::size_t count,
                                                  std::optional<int32_t> offset_in = std::nullopt,
@@ -203,6 +209,9 @@ public:
     }
 
 protected:
+    [[nodiscard]] virtual expected_result read_impl(void *buffer, std::size_t buffer_size) const noexcept;
+    [[nodiscard]] virtual expected_result write_impl(const void *buffer, std::size_t buffer_size) const noexcept;
+
     [[nodiscard]] std::error_code select(int64_t timeout_nanoseconds) const noexcept;
     [[nodiscard]] std::error_code poll(int64_t timeout_nanoseconds, polled_state &state) const noexcept;
 };

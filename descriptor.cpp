@@ -69,12 +69,9 @@ std::error_code descriptor::duplicate(int32_t other) noexcept {
 }
 
 
-expected_result descriptor::read(std::span<std::byte> buffer) const noexcept {
+expected_result descriptor::read_impl(void *buffer, std::size_t buffer_size) const noexcept {
     if (descriptor_.load() != -1) {
-        auto const result =
-            ::read(descriptor_.load(),
-                    static_cast<void*>(buffer.data()),
-                    static_cast<std::size_t>(buffer.size()));
+        auto const result = ::read(descriptor_.load(), buffer, buffer_size);
 
         return result != -1 ? expected_result{result}
                             : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
@@ -83,12 +80,9 @@ expected_result descriptor::read(std::span<std::byte> buffer) const noexcept {
     return std::unexpected(std::make_error_code(std::errc::bad_file_descriptor));
 }
 
-expected_result descriptor::write(std::span<const std::byte> buffer) const noexcept {
+expected_result descriptor::write_impl(const void *buffer, std::size_t buffer_size) const noexcept {
     if (descriptor_.load() != -1) {
-        auto const result =
-            ::write(descriptor_.load(),
-                    static_cast<const void*>(buffer.data()),
-                    static_cast<std::size_t>(buffer.size()));
+        auto const result = ::write(descriptor_.load(), buffer, buffer_size);
 
         return result != -1 ? expected_result{result}
                             : std::unexpected(std::make_error_code(static_cast<std::errc>(errno)));
